@@ -1,0 +1,16 @@
+\documentclass[a4paper, fleqn]{article}
+\setlength\mathindent{0em}
+\parskip = 7bp
+\begin{document}
+
+\section{Note for Solution to Exercise 8.1-3 in Instructor's Manual}
+
+$\lg(n!) \geq n \lg n - n \lg e$ because
+\begin{eqnarray*}
+n! & = & \sqrt{2 \pi n} \left(\frac{n}{e}\right)^n \left(1 + \Theta\left(\frac{1}{n}\right)\right) \\
+   & \geq & \left(\frac{n}{e}\right)^n
+\end{eqnarray*}
+according to Stirlings approximation.
+
+\end{document}
+

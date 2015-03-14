@@ -1,0 +1,78 @@
+\documentclass[a4paper, fleqn]{article}
+\setlength\mathindent{0em}
+\parskip = 7bp
+\begin{document}
+
+\section{Inverse via Gauss-Jordan elimination}
+
+In linear algebra, Gauss-Jordan elimination is a version of Gaussian
+elimination that puts zeros both above and below each pivot element as
+it goes from the top row of the given matrix to the bottom. In other
+words, Gauss-Jordan elimination brings a matrix to \textbf{reduced row
+echelon form}, whereas Gaussian elimination takes it only as far as
+\textbf{row echelon form}. Every matrix has a reduced row echelon
+form, and this algorithm is guaranteed to produce it.
+
+Gauss-Jordan elimination is considerably less efficient than Gaussian
+elimination with back substitution when solving a system of linear
+equations. However, it is well suited for calculating the matrix
+inverse.
+
+If Gauss-Jordan elimination is applied on a square matrix, it can be
+used to calculate the matrix's inverse. This can be done by augmenting
+the square matrix with the identity matrix of the same dimensions, and
+through the following matrix operations:
+\[
+(A|I) \Longrightarrow A^{-1}(A|I) \Longrightarrow (I|A^{-1}).
+\]
+If the original square matrix, $A$, is given by the following
+expression:
+\[
+A =
+\left(\begin{array}{ccc}
+2 & -1 & 0 \\
+-1 & 2 & -1 \\
+0 & -1 & 2
+\end{array}\right),
+\]
+then, after augmenting by the identity, the following is obtained:
+\[
+(A|I) =
+\left(\begin{array}{cccccc}
+2 & -1 & 0 & 1 & 0 & 0 \\
+-1 & 2 & -1 & 0 & 1 & 0 \\
+0 & -1 & 2 & 0 & 0 & 1
+\end{array}\right).
+\]
+By performing \textbf{elementary row operations} on the $(A|I)$ matrix
+until $A$ reaches reduced row echelon form, the following is the final
+result:
+\[
+(I|A^{-1}) = 
+\left(\begin{array}{cccccc}
+1 & 0 & 0 & 3/4 & 1/2 & 1/4 \\
+0 & 1 & 0 & 1/2 &  1  & 1/2 \\
+0 & 0 & 1 & 1/4 & 1/2 & 3/4
+\end{array}\right).
+\]
+The matrix augmentation can now be undone, which gives the following:
+\[
+I =
+\left(\begin{array}{ccc}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{array}\right),
+\hspace{1cm}
+A^{-1} =
+\left(\begin{array}{ccc}
+3/4 & 1/2 & 1/4 \\
+1/2 &  1  & 1/2 \\
+1/4 & 1/2 & 3/4
+\end{array}\right).
+\]
+A matrix is non-singular (meaning that it has an inverse matrix) if
+and only if the identity matrix can be obtained using only elementary
+row operations.
+
+\end{document}

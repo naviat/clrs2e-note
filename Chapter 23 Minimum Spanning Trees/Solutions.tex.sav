@@ -1,0 +1,43 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{clrscode}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\setlength\mathindent{0em}
+\parskip = 5bp
+
+\title{Solutions for Chapter 23}
+\author{Zhixiang Zhu  \\\href{mailto:zzxiang21cn@hotmail.com}{zzxiang21cn@hotmail.com}}
+
+\begin{document}
+
+\maketitle
+
+\section*{Solution to Exercise 23.1-2}
+
+Let $V = \{ a, b, c \}$, $E = \{ (a, b), (b, c), (a, c) \}$, $w(a, b) = 1$, $w(b, c) = 2$, $w(a, c) = 3$, $A = \emptyset$ and $S = \{ b \}$. $(b, c)$ is a safe edge for $A$, but it is not a light edge for the cut.
+
+
+\section*{Solution to Exercise 23.1-3}
+
+If we remove $(u, v)$ from the minimum spanning tree it is in, the spanning tree will be disconnected and divided into two components. Let one of the two components be $S$, then $(u, v)$ must be a light edge crossing the cut $(S, V - S)$; otherwise we can add a light edge of the cut to the disconnected tree so that the newly formed spanning tree has a smaller total weight, contradicting that $(u, v)$ is in a minimum spanning tree.
+
+
+\section*{Solution to Exercise 23.1-4}
+
+Let's say we have a graph consisting of three vertices: $u, v, w$; and the weights of $(u, v), (v, w)$ and $(u, w)$ are all equal.
+
+
+\section*{Solution to Exercise 23.1-5}
+
+Because $e$ is on a cycle, any cut crossed by $e$ must also be crossed by some other edge on the cycle. If we build the minimum spanning tree by choosing light edges, $e$ will never be chosen, so that the constructed minimum spanning tree will not include $e$.
+
+
+\section*{Solution to Exercise 23.1-7}
+
+If all edge weights are positive, such a subset of edges must be acyclic; otherwise we can remove the edges who have bigger weights until the subset becomes acyclic to get a smaller total weight. Since it is acyclic and connects all vertices, it is a spanning tree.
+
+\end{document}

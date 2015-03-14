@@ -1,0 +1,574 @@
+\documentclass[fleqn]{article}
+\usepackage{clrscode}
+\setlength\mathindent{0em}
+\parskip = 7bp
+\begin{document}
+
+\section*{Solution to Exercise 16.1-1}
+
+\begin{codebox}
+\Procname{\proc{DP-Activity-Selector}$(s,f)$}
+\li \For $i \gets 0$ \To $n+1$
+\li   \Do
+        $c[i,i] \gets 0$
+      \End
+\li \For $l \gets 2$ \To $n+2$
+\li   \Do
+        \For $i \gets 0$ \To $n+1-l+1$
+\li       \Do
+            $j \gets i+l-1$
+\li         $c[i,j] \gets 0$
+\li         $s[i,j] \gets 0$
+\li         \For $k \gets i+1$ \To $j-1$
+\li           \Do
+                \If $s_k \geq f_i$ and $f_k \leq s_j$
+\li               \Then
+                    $q \gets c[i,k] + c[k,j] + 1$
+\li                 \If $q > c[i,j]$
+\li                   \Then
+                        $c[i,j] \gets q$
+\li                     $s[i,j] \gets k$
+                      \End  % if
+\li               \End  % if
+              \End  % for k
+          \End  % for i
+      \End  % for l
+\li \Return $c$ and $s$
+\end{codebox}
+
+The running time of \proc{DP-Activity-Selector}: $\Theta(n^3)$.
+
+\begin{codebox}
+\Procname{\proc{Print-Selected-Activities}$(s,i,j)$}
+\li \If $i \geq j$
+\li   \Then
+        \Return
+      \End
+\li $k \gets s[i,j]$
+\li \If $k = 0$
+\li   \Then
+        \Return
+      \End
+\li \proc{Print-Selected-Activities}$(s,i,k)$
+\li print $a_k$
+\li \proc{Print-Selected-Activities}$(s,k,j)$
+\end{codebox}
+
+The initial call is \proc{Print-Selected-Activities}$(s,0,n+1)$, whose
+running time is $O(n)$.
+
+
+
+
+
+
+
+\section*{Solution to Exercise 16.2-1}
+
+Suppose that an optimal solution contains in the knapsack $p$ pounds
+of some item $i$ whose value per pound is not the greatest compared
+with the items outside the knapsack, and outside the knapsack there
+are still $q$ pounds of the item $j$ whose value per pound is the
+greatest. If $p > 0$ and $q > 0$, then we can substitute $\min(p,q)$
+pounds of item $i$ in the knapsack with item $j$ to yield a solution
+having more valuable load: a contradiction.  Therefore, an optimal
+solution must have either $p = 0$ or $q = 0$, or both.
+
+
+
+
+
+
+\section*{Solution to Exercise 16.2-3}
+
+Suppose that we have the $n$ items sorted in place by increasing
+weight. We will denote the subproblem of items $i$--$j$ by $S_{ij}$.
+Then item $i$ must be used in the optimal solution to $S_{ij}$,
+otherwise we can substitute any item in the optimal solution with item
+$i$ to yield another solution having more value: a contradiction.
+Therefore, the approach to find a solution to the original problem is
+always selecting the lightest (or the most valuable) remaining item.
+
+
+
+
+
+
+\section*{Solution to Exercise 16.3-2}
+
+Since we have $F_{i+2} = F_{i+1} + F_i$ for all $i \geq 0$ in the
+Fibonacci number array, the Fibonacci array is in monotonically
+increasing order. It can also be proved by induction that $\sum_0^i
+F_j < F_{i+2}$. Therefore, if the characters is in the increasing
+order of their frequencies in a linked list, we can construct an
+optimal code by always merging the first two nodes in the list.
+
+
+
+
+
+
+\section*{Solution to Exercise 16.3-3}
+
+The total cost of a tree for a code is computed by equation (16.5),
+which is a summation of frequencies of leaves. In the summation, the
+number of times a frequency appears as an operand equals the depth of
+the corresponding leaf. We know that the depth of a leaf equals the
+number of internal nodes on the path from the root to the leaf.
+Therefore, we can also compute the total cost in the following way:
+First set the cost of each internal node to be zero; second, for each
+leaf, add its frequency to the cost of each internal node on the path
+from the root to it; at last, add up the all the costs of internal
+node. The result is just the total cost of the tree for a code. It
+also equals to the summation of the frequencies of all the internal
+nodes, i.e., the summation, over all internal nodes, of the combined
+frequencies of the two children of the node.
+
+
+
+
+
+
+\section*{Solution to Exercise 16.3-4}
+
+Suppose that the characters $c_1, c_2, \ldots, c_n$ are in the
+decreasing order of their frequencies. Also suppose that $T$
+represents an optimal code of these $n$ characters. If there are two
+characters $c_i, c_j$ where $i < j$ and the depth of $c_i$ in $T$ is
+larger than the depth of $c_j$, i.e. $d_T(c_i) > d_T(c_j)$, then
+according to equation (16.5), we can exchange the positions of $c_i$
+and $c_j$ in $T$ to produce a tree having lower cost. This is a
+contradiction to the assumption that $T$ represents an optimal prefix
+code for these $n$ characters. Therefore, for any two characters $c_i$
+and $c_j$, if $f(c_i) \geq f(c_j)$, then we must have $d_T(c_i) \leq
+d_T(c_j)$ in any tree representing an optimal prefix code, so that
+there exists an optimal code in which the codeword length of $c_i$ is
+not larger than that of $c_j$.
+
+
+
+
+
+
+\section*{Solution to Exercise 16.3-5}
+
+Let's describe the situation more precisely. Suppose that each
+character in an alphabet $C$ of size $n$ is given an index between 0
+and $n-1$, inclusive. Now the sender has constructed a binary tree
+representing an optimal prefix code on this alphabet, and converted
+this tree in an array of bits. The array is sent to the receiver. The
+receiver has no knowledge on the alphabet. She has to convert the
+array received back to the original binary tree, with each leaf marked
+with the index in the alphabet of its corresponding character.
+
+The sender will first specify the structure of the tree in a
+bit-array, then append the alphabetic indices of $c_0, c_1, \ldots,
+c_n$ to the array in the order of their appearances in the pre-order
+walk of the tree. Suppose that the array is initially empty. In the
+first step, he simply pre-order walks through the tree and appends the
+binary code for the edge he traverses to the bit-array (note that each
+edge is appended only at his first time traversing it). When all the
+edges have been traversed, he will append bit 1 to the array to
+indicate that the traversing is over. We will see why this works
+correctly when later we describe the procedure of the receiver. The
+second step is trivial. 
+
+On the side of the receiver, her first task is to rebuild the
+structure of the tree on the reception of the bit-array. She will
+initially build a binary tree containing only one node, i.e. the root,
+start by a pointer $p$ pointing to the root and read the bit-array
+received as a stream. If she gets a 0, she will create a new node as
+$p$'s left child then let $p$ point to it; if she gets a 1, she will
+let $p$ travel up through its ancestors until $p$ points to a node
+having only one child, then create a new node as $p$'s right child,
+and let $p$ point to the new node. This approach works because it is
+guaranteed by the fact that an optimal prefix-code binary tree is full
+and the protocol that the sender traverses the tree in pre-order walk.
+The fact and the protocol also together guarantees that the receiver
+won't meet two consecutive 1 when she is rebuilding the structure of
+the tree. On her first meet with two consecutive 1 when she is reading
+the bit stream, the second 1 indicates that the rebuilding of the
+structre of the tree has been completed.
+
+The next step for the receiver is also trivial. She will pre-order
+walk the tree again. When she meets a leaf, she will read $\lfloor \lg
+n \rfloor$ bits from the remaining bit stream, and mark the leaf with
+the bits read, since we need at least $\lfloor \lg n \rfloor$ bits to
+represent a value lying between 0 and $n-1$.
+
+The tree is full and has $n$ leaves, therefore, there are $n-1$
+internal nodes, thus $2n-2$ edges in the tree, and $2n-1$ bits
+specifying the structure of the tree (the last bit indicates the end
+of this part). Thus, we need totally $2n - 1 + n \lfloor \lg n
+\rfloor$ bits to represent an optimal prefix code on an alphabet with
+size $n$.
+
+
+
+
+
+
+
+\section*{Solution to Exercise 16.3-7}
+
+We will prove that Huffman coding will construct a complete binary
+tree in this case, yielding the same as an ordinary 8-bit fixed-length
+code.
+
+Suppose initially that the 256 frequencies are in the increasing order
+as $f_1^{(0)}, f_2^{(0)}, \ldots, f_{256}^{(0)}$. The first merging
+will pick $f_1^{(0)}$ and $f_2^{(0)}$, yeilding a new frequency
+$f_1^{(1)}$. Because $f_{256}^{(0)} < 2f_1^{(0)}$ and $f_1^{(0)} \leq
+f_2^{(0)}$, we have $f_{256}^{(0)} < f_1^{(1)}$. Therefore,
+$f_3^{(0)}, f_4^{(0)}, \ldots, f_{256}^{(0)}, f_1^{(1)}$ are in the
+increasing order; also, the new maximum frequency $f_1^{(1)} =
+f_1^{(0)} + f_2^{(0)}$ is no larger than twice the new minimum
+frequency $f_3^{(0)}$ since $f_1^{(0)} \leq f_2^{(0)} \leq f_3^{(0)}$.
+Similarly, the second merging will pick $f_3^{(0)}$ and $f_4^{(0)}$,
+yeilding a new frequency which can be appended to the frequency array,
+so that the new array contains one less element but has the same
+properties: the frequencies are in monotonically increasing order and
+the maximum frequency (which is denoted by $f_2^{(1)}$ in this array)
+is no larger than twice the minimum frequency (which is $f_4^{(0)}$).
+
+Based on the procedure described above, we can define $f_i^{(j)}$ as
+$f_i^{(j)} = f_{\lceil i/2 \rceil}^{(j-1)} + f_{\lceil i/2 \rceil +
+1}^{(j-1)}$, where $j > 0$. The length of the frequency array is
+initially even (which is 256), and the mergers always pick the first
+two elements then append the new frequency to the array's end.  Thus,
+there are no other forms of mergers than the one defined for
+$f_i^{(j)}$. Each array in the form of $f_1^{(j)}, \ldots,
+f_{2^{8-j}}^{(j)}$ forms the $j$th level from the bottom of a complete
+binary tree having 256 leaves. There are 9 such arrays. These arrays
+together form the binary tree produced by Huffman coding. Since it is
+a complete binary tree, the prefix code represented by this tree is
+the same as an ordinary 8-bit fixed-length code.
+
+
+
+
+
+
+\section*{Solution to Exercise 16.5-2}
+
+The procedure \proc{Is-Independent} below judges that wheter $A$ is
+independent:
+
+\begin{codebox}
+\Procname{\proc{Is-Independent}$(A)$}
+\li $n \gets |A|$
+\li create an array $B[1..n]$
+\li \For $i \gets 1$ \To $n$
+\li   \Do
+        $B[i] \gets 0$
+      \End
+\li \For each $d_i \in A$
+\li   \Do
+        \If $d_i \leq n$
+\li       \Then
+            $B[d_i] \gets B[d_i] + 1$
+          \End
+      \End
+\li $\id{sum} \gets 0$
+\li \For $t \gets 1$ \To $n$
+\li   \Do
+        $\id{sum} \gets \id{sum} + B[t]$
+\li     \If $\id{sum} > t$
+\li       \Then
+            \Return \const{false}
+          \End
+      \End
+\li \Return \const{true}
+\end{codebox}
+
+
+
+
+
+\section*{Solution to Problem 16-2}
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+\stepcounter{enumi}
+
+\item  % b
+
+This problem can also be solved by greedy algorithm. The optimal
+substructure is: in an optimal schedule of $S = \{a_1, a_2, \ldots,
+a_n\}$, if the first unit time is allocated to task $a_i$, then the
+schedule after the first unit time must be an optimal schedule of $(S
+- \{a_i\}) \cup \{a'_i\}$ where $a'_i$ is the unprocessed part of
+$a_i$.
+
+Therefore, the subproblem is to determine that to which task we should
+allocate the first unit time. As a greedy solution, it is always safe
+to allocate the first unit time to the task which has been released
+and which requires the shortest processing time.
+
+To see why, first notice that in an optimal schedule, the first unit
+time is always allocated to a task released at the beginning of the
+schedule unless no task is released yet. The reason is trivial. Then
+notice that in an optimal schedule, the shortest task of those
+released at the beginning must be completed first among those tasks.
+To see why, suppose that $a_i$ and $a_j$ are two tasks released at the
+beginning and $p_i < p_j$. If $c_i > c_j$, then we can select any
+$p_i$ units of processing time of $a_j$ and exchange these unit time
+with the ones processing $a_i$, to yield a smaller average completion
+time. Therefore, if an optimal schedule does not allocate the first
+unit time to the task, say $a_s$, which is the shortest among those
+released at the beginning, then we can exchange the first unit time
+with the the unit time that completes $a_s$ to let $a_s$ processed
+first, so that $a_s$ is completed ealier and the average completion
+time also becomes smaller, which is contradictory to that the original
+schedule is optimal.
+
+To implement the algorithm, we can first construct a sorted list of
+the tasks in the increasing order of their release time, and then
+maintain a red-black tree in which each node correspond to a unique
+task that has been released, and the keys in the tree are the
+processing times. We initially set the current time to be 0, then we
+perform the following operations sequentially: (1) extract the tasks
+that are currently released from the list, and insert them to the
+tree, (2) extract the minimum node $x$ of the tree and allocate a unit
+time to it, (3) decrease the processing time of $x$ by 1, (4) if the
+processing time of $x$ is zero, then discard $x$, otherwise insert $x$
+back to the tree, (5) increase the current time by 1, if the list and
+the tree are both empty, then we are done, otherwise go back to step
+(1). Initally constructing the list requires $O(n \lg n)$ time, the
+extraction operation on the list totally requires $\Theta(n)$ time,
+each extraction or insertion operation on the tree requires $O(\lg n)$
+time; suppose that $k$ units of time are required to complete all the
+task in an optimal schedule, then there are totally at most $k$
+extractions and $O(k)$ insertions. Therefore, the running time of this
+implementation is $O(k \lg n)$.
+
+However, we can implement the algorithm more efficiently. Notice the
+fact that if a set of tasks are all released at the beginning, then
+the problem of scheduling this set of tasks is the same as
+\textit{\textbf{a}}. That's because after the first unit time is
+allocated to the shortest task $a_s$, the unprocessed part of $a_s$
+will still be the shortest task in the set. Therefore, we can
+implement the algorithm as the procedure below:
+
+\begin{codebox}
+\Procname{\proc{Schedule}$(S)$}
+\li sort the tasks by the increasing order of their release times \\
+    in a linked list $L$.
+\li create an empty red-black tree $T$ in which the tasks will be \\
+    sorted by the increasing order of their processing time.
+\li \While not both $L$ and $T$ are empty
+\li   \Do
+        $\id{cur} \gets \infty$
+\li     \While $L$ is not empty and $\id{cur} \geq r[\id{head}[L]]$
+\li       \Do
+            $\id{cur} \gets r[\id{head}[L]]$
+\li         extract $\id{head}[L]$ and insert it into $T$
+          \End
+\li     \If $L$ is empty
+\li       \Then
+            $t \gets \infty$
+\li       \Else
+            $t \gets r[\id{head}[L]] - \id{cur}$
+          \End
+\li     \While $T$ is not empty and $t > 0$
+\li       \Do
+            extract the minimum in $T$ and let it be $x$
+\li         \If $p[x] > t$
+\li           \Then
+                $\id{end} \gets \id{cur} + t$
+\li             $p[x] \gets p[x] - t$
+\li             insert $x$ back into $T$
+\li             $t \gets 0$
+\li           \Else
+                $\id{end} \gets \id{cur} + p[x]$
+\li             $t \gets t - p[x]$
+              \End
+\li         print ``time-interval ['' \id{cur} ``,'' \id{end} \\
+\>\>\>\>    ``) is allocated to task '' $x$
+\li         $\id{cur} \gets \id{end}$
+          \End
+      \End
+\end{codebox}
+
+The construction of $L$ takes $O(n \lg n)$ time. The extraction
+operations on $L$ take $\Theta(n)$ time in total. The analysis of the
+operations on $T$ is a bit complex. There are two kinds of operations
+on $T$ which do not take constant time--extraction and insertion, each
+take $O(\lg n)$ time.
+
+For the insertion operation, notice that it is performed at most once
+during an iteration of the outer \kw{while} loop. The outer \kw{while}
+loop iterates at most $n$ times, because in each iteration of the
+outer loop, the first inner \kw{while} loop will extract at least one
+node from $L$, and if $L$ is extracted to be empty, $t$ will be
+assigned $\infty$ so that the second inner loop will iterate until $T$
+also becomes empty. Therefore, the insertion operation is performed at
+most $n$ times in total.
+
+For an extraction operation during an iteration of the second inner
+loop, if it is not followed by an insertion, then the node extracted
+will be discarded. There are at most $n$ nodes to be discarded.
+Therefore, the extraction operation is performed at most $2n$ times.
+
+Thus, this implementation takes $O(n \lg n)$ running time.
+
+\end{enumerate}
+
+
+
+
+
+
+\section*{Solution to Problem 16-3}
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+\stepcounter{enumi}
+
+\item  % b
+
+First let's give a more formal definition of ``linearly independent
+over the field of integers modulo 2''. If for a set of vectors
+$\mathbf{v_1}, \mathbf{v_2}, \ldots, \mathbf{v_k}$, there exist $k$
+0-or-1 numbers $c_1, c_2, \ldots, c_k$ where not all are zero, such
+that
+
+\[
+c_1\mathbf{v_1} + c_2\mathbf{v_2} + \cdots c_k\mathbf{v_k} \equiv
+\mathbf{0} \mbox{ (mod 2)},
+\]
+
+then these $k$ vectors are \emph{linearly dependent} over the field of
+integers modulo 2.
+
+Here comes the proof. For the ``only if'' part, suppose that
+$\mathbf{e_1}, \mathbf{e_2}, \ldots, \mathbf{e_k}$ form a circuit. In
+the subgraph of these $k$ edges, each vertex is incident on exactly
+two edges. Therefore, we have $\mathbf{e_1} + \mathbf{e_2} + \cdots +
+\mathbf{e_k} = \mathbf{2} \equiv \mathbf{0} \mbox{ (mod 2)}$, so that
+the $k$ corresponding columns are linearly \emph{dependent} over the
+field of integers modulo 2.
+
+For the ``if'' part, suppose that a set of columns of $M$ is linearly
+\emph{dependent} over the field of integers modulo 2, then in the
+corresponding subgraph, each vertex must be incident on an even number
+of edges. Therefore, there must exist an Euler circuit in this
+subgraph according to graph theory.
+
+The alternate proof of part (a) is omitted.
+
+
+\stepcounter{enumi}
+
+\item  % d
+
+Let $V = \{a, b, c\}$ and $G = \{ab, bc, ca, ba\}$. For $A = \{ab,
+bc\}$ and $B = \{ba, bc, ca\}$, we have $A \in l$, $B \in l$ and $|A|
+< |B|$. However, neither of the elements in $B - A = \{ba, ca\}$ can
+unite $A$ to form an independent set. The exchange property fails to
+hold.
+
+
+\item  % e
+
+Adding the columns corresponding to a directed cycle will result in a
+zero vector.
+
+
+\item  % f
+
+The reason is that the subgraph of acyclic directed edges and the set
+of linearly independent columns do not have a one-to-one mapping
+relationship. The columns corresponding to a set of acyclic edges are
+not neccessarily linearly independent. Consider $B$ in the counter
+example given in \textit{\textbf{d}}, if we multiply the column
+corresponding to $ba$ by 1, and add the product to the sum of $bc$ and
+$ca$, we will get a zero vector, so that the columns of $B$ are not
+linearly independent.
+
+\end{enumerate}
+
+
+
+
+
+
+\section*{Solution to Problem 16-4}
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+
+\item  % a
+
+Suppose that the tasks have been sorted in the order of monotonically
+decreasing penalty, and $a_{1..i-1}$ have been assigned to the time
+slots $t'_{1..i-1}$ at the start of the $i$th step, which forms part
+of an optimal answer. For the remaining time slots $t_{1..n-i+1}$
+(suppose the slots are in the increasing time order), if all the slots
+are after $d_i$, then we can always assign $a_i$ to slot $t_{n-i+1}$.
+Because if $a_i$ is assigned to slot $t_j$ in an optimal answer where
+$j < n-i+1$, then we can switch the positions of $a_i$ and the task
+assigned to $t_{n-i+1}$ (denoted by $a'$) without causing the total
+penalty larger, since $a_i$ will still be late and $a'$ will be
+finished earlier.
+
+If slots $t_{1..j}$ ($1 \leq j \leq n-i+1$) are all the remaining
+slots which are at or before $d_i$, and in an optimal answer $a_i$ is
+assigned to $t_k$ where $k \neq j$. If $k > j$, then since $a_i$'s
+penalty is larger than that of any other unassigned task, switch the
+positions of $a_i$ and the task assigned to $t_j$ (denoted by $a'$)
+will produce a smaller total penalty, which contradits the optimal
+answer. Therefore, we must have $k < j$. Then we can switch the
+positions of $a_i$ and $a'$ without causing the total penalty larger,
+because $a_i$ will still be finished before $d_i$ and $a'$ will be
+finished earlier, so that the answer will still optimal.
+
+
+\item  % b
+
+We will define a collection of disjoint sets, where all the elements
+in a set form a sequence of consecutive slots. The representative of a
+set is the earliest slot in it. In order to achieve efficiency, we
+will implement the disjoint sets by the disjoint-set forest presented
+in Section 21.3, and use the heuristic of path compression to
+implement \proc{Find-Set}. However, we will implement the \proc{Union}
+operation in such a way that the root which is later in time is made
+to point to the earlier root. The \proc{Make-Set} operation creates a
+new set containing only one slot. Therefore, either the \proc{Union}
+or \proc{Make-Set} operation takes constant time.
+
+Suppose that the set of input tasks has already been sorted in $A$
+into monotonically decreasing order by penalty, the procedure below
+takes $A$ as input and allocates slots 1--$n$ to the $n$ unit-time
+takas in $A$.
+
+\begin{codebox}
+\Procname{$\proc{Schedule-Variation}(A)$}
+\li $n \gets \id{length}[A]$
+\li \For $i \gets 1$ \To $n$    \label{li:sv-1st-for-begin}
+\li   \Do
+        \proc{Make-Set}$(i)$
+      \End                      \label{li:sv-1st-for-end}
+\li \For $i \gets 1$ \To $n$    \label{li:sv-2nd-for-begin}
+\li   \Do
+        $j \gets \proc{Find-Set}(d_i)$
+\li     \If $j$ is empty
+\li       \Then
+            $k \gets j$
+\li       \Else
+            $k \gets \proc{Find-Set}(n)$
+          \End
+\li     assign $a_i$ to $k$
+\li     \proc{Union}$(\proc{Find-Set}(k-1), k)$
+      \End                      \label{li:sv-2nd-for-end}
+\end{codebox}
+
+There are $n$ \proc{Make-Set} operations and at most $3n$
+\proc{Find-Set} operations. Therefore, according to the statement at
+the end of Section 21.3, the worst-case running time of the
+\proc{Schedule-Variation} procedure is $\Theta(n + 3n \cdot (1 +
+\log_{2+3n/n}n)) = \Theta(n)$.
+
+\end{enumerate}
+
+\end{document}

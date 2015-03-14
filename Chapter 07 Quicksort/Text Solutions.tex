@@ -1,0 +1,589 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{clrscode}
+\setlength\mathindent{0em}
+\parskip=7bp
+\begin{document}
+
+\section*{Solution to Exercise 7.2-1}
+Assume that $T(k) = \Theta(k^2)$ holds for $k \leq n-1$, that is, $c_1 (n-1)^2 
+\leq T(n-1) \leq c_2 (n-1)^2$ holds for some positive constants $c_1$, $c_2$. 
+Substituting the left side inequality into the recurrence yields
+\begin{eqnarray*}
+T(n) & \geq & c_1 (n-1)^2 + d_1 n \hspace{15mm} d_1 \mbox{ is some positive constant.} \\
+     &   =  & c_1 n^2 + (d_1 - 2c_1)n + c_1 \\
+     & \geq & c_1 n^2,
+\end{eqnarray*}
+where the last step holds as long as $c_1 \leq d_1 / 2$. Therefore, $T(n) = \Omega(n^2)$.
+
+The $O(n^2)$ part can be similarly proved.
+
+
+
+
+
+
+
+\section*{Solution to Exercise 7.2-6}
+In this argument, we will assume that all the elements in the input array are 
+distinct. For any input array of size $n$, if the $i$th smallest element is in 
+position $n$, then \proc{Partition} will produce a split of $n-i$ to $i-1$, 
+where $1 \leq i \leq n$. This split is more balanced than $1 - \alpha$ to 
+$\alpha$ if and only if $\alpha < i/n < 1 - \alpha$. The number of such $i$ is 
+approximately $(1-2\alpha)n$. Since the probability of any $i$th smallest 
+element to be in a specific position is equal to $1/n$, the probability that 
+\proc{Partition} produces a split more balanced than $1-\alpha$ to $\alpha$ is 
+approximately $(1-2\alpha)n/n = 1-2\alpha$.
+
+
+
+
+
+
+
+\section*{Solution to Exercise 7.3-2}
+It is obvious that the number of calls made to the random-number generator 
+\proc{Random} is equal to the number of calls to \proc{Randomized-Partition}. 
+Therefore, this is also the number of non-leaf nodes in the recursion tree 
+for \proc{Randomized-Quicksort}.
+
+The best case occurs when each call to \proc{Randomized-Partition} partitions 
+its input array into three sets --- those less than or equal to the pivot, 
+those greater than the pivot, and the pivot itself. In this case, each node in 
+the recursion tree corresponds to a unique element in the original input array, 
+and the total number of nodes in the recursion tree is $n$, which is the size 
+of the original input array. Notice that there's no degree-1 node in the 
+recursion tree since each call to \proc{Randomized-Quicksort} makes either no 
+or two recursive calls. Thus, letting $x$ be the number of non-leaf nodes in 
+the recursion tree, we have $2x + 1 = n$ from Exercise B.5-3, and $x = (n - 1) 
+/ 2$.
+
+The worst case occurs when each call to \proc{Randomized-Partition} partitions 
+its input array into only two sets --- those that are not pivot, and the pivot 
+itself. In this case, there are $n$ leaves, and the number of non-leaf nodes is 
+therefore $n - 1$ from Exercise B.5-3.
+
+Thus, in either the best case or the worst case, the number of calls that are 
+made to the random-number generator \proc{Random} is $\Theta(n)$.
+
+
+
+
+
+
+
+\section*{Solution to Exercise 7.4-5}
+We will adopt the method used in subsection 7.4.2, which define
+\[
+X_{ij} = \mbox{I}\{z_i \mbox{ is compared to } z_j\},
+\]
+and
+\[
+X = \sum_{i=1}^{n-1} \sum_{j=i+1}^n X_{ij}.
+\]
+Since quicksort will return when its input array has fewer than $k$ elements, 
+there maybe no pivot is chosen from $Z_{ij}$ if $j - i + 1 < k$. Thus, we have
+\[
+\mbox{Pr}\{z_i \mbox{ is compared to } z_j\} < \frac{2}{j - i + 1}
+\]
+for such $Z_{ij}$, and this time we will evaluate E[$X$] using inequalities 
+(A.13) and (A.14) as
+\begin{eqnarray*}
+\mbox{E}[X] 
+& \leq & \sum_{i=1}^{n-1}\sum_{j=i+1}^n \frac{2}{j-i+1} \\
+& \leq & \sum_{i=1}^{n-k+1}\sum_{j=i+k-1}^n \frac{2}{j-i+1} + 
+         \sum_{i=1}^{n-k+2}\sum_{j=i+1}^{i+k-2} 1 + 
+         \sum_{i=n-k+2}^{n-1}\sum_{j=i+1}^n \frac{2}{j-i+1} \\
+& = & \sum_{i=1}^{n-k+1}\sum_{j=i+k-1}^n \frac{2}{j-i+1} + (n-k+1)(k-2) + 
+      \sum_{i=n-k+2}^{n-1}\sum_{j=1}^{n-i+1} \frac{2}{j} \\
+& \leq & \sum_{i=1}^{n-k+1}\sum_{j=i+k-1}^n \frac{2}{j-i+1} + nk + 
+         \sum_{i=n-k+2}^{n-1}\sum_{j=1}^{k-1} \frac{2}{j} \\
+& = & \sum_{i=1}^{n-k+1}\sum_{j=k}^{n-i+1} \frac{2}{j} + nk + 
+      2(k-2)(\ln(k-1) + 1) \\
+& = & \sum_{i=1}^{n-k+1}\left(\sum_{j=1}^{n-i+1}\frac{2}{j} - 
+      \sum_{j=1}^{k-1}\frac{2}{j}\right) + nk + 2k(\ln k + 1) \\
+& \leq & \sum_{i=1}^{n-k+1}\left(\sum_{j=1}^{n}\frac{2}{j} - 
+         \sum_{j=1}^{k-1}\frac{2}{j}\right) + nk + 2k(\ln k + 1) \\
+& \leq & 2\sum_{i=1}^{n-k+1}\left(\ln n + 1 - \ln k\right) + nk + 2nk \\
+& = & 2(n-k+1)(\ln(n/k) + 1) + nk + 2nk \\
+& \leq & 2n(\ln(n/k) + 1) + 3nk \\
+& = & O(n\lg(n/k) + nk).
+\end{eqnarray*}
+\indent
+Now consider the insertion sort part. If the expected number of partitions 
+resulting from the quicksort part is $m$, then each partition will have $n/m$ 
+elements on average, and the insertion sort part will run in $O(m(n/m)^2) = 
+O(n^2/m)$ expected time. We know that $m > n/k$ since each partition contains 
+fewer than $k$ elements. Therefore, the insertion sort part runs in $O(n^2/(n/k)) 
+= O(nk)$ expected time. The whole sorting algorithm runs in $O(nk + n\lg(n/k))$ 
+expected time.
+
+
+
+
+
+
+
+\section*{Solution to Exercise 7.4-6}
+Again, we assume that all elements in the input array are distinct. In this case, 
+the probability that the $i$th smallest element becomes the pivot is
+\begin{eqnarray*}
+\Pr\{z_i \mbox{ is the pivot}\} & = & p_i \\
+& = & \frac{(i - 1)(n - i)}{\left(\!\begin{array}{c}n \\ 3\end{array}\!\right)} \\
+& = & \frac{6(-i^2 + (n + 1)i - n)}{n(n - 1)(n - 2)}.
+\end{eqnarray*}
+where $2 \leq i \leq n - 1$ and $n \geq 3$.
+
+Supposing that $0 < \alpha \leq 1/2$, the probability of getting at worst an 
+$\alpha$-to-$(1 - \alpha)$ split is approximately
+\begin{eqnarray*}
+P & = & \sum_{i = \alpha n}^{(1 - \alpha)n} p_i \\
+  & = & \frac{6}{n(n - 1)(n - 2)} \sum_{i = \alpha n}^{(1 - \alpha)n} (-i^2 + (n + 1)i - n) \\
+  & = & \frac{6}{n(n - 1)(n - 2)} \left(\frac{(1 - 2\alpha)n^2(n+1)}{2} - (1 - 2\alpha)n^2 - n - \sum_{i = \alpha n}^{(1 - \alpha)n} i^2 \right) \\
+  & = & \frac{6}{n(n - 1)(n - 2)} \left(\frac{(1 - 2\alpha)n^2(n-1)}{2} - n - \sum_{i=1}^{(1-\alpha)n} i^2 + \sum_{i=1}^{\alpha n - 1} i^2 \right) \\
+  & = & \frac{6}{n(n - 1)(n - 2)} \left(\frac{(1 - 2\alpha)n^2(n-1)}{2} - n - \right. \\
+  &   & \left. \frac{(1-\alpha)n((1-\alpha)n + 1)(2n(1-\alpha) + 1)}{6} + \frac{(\alpha n - 1)\alpha n(2\alpha n - 1)}{6} \right) \\
+  & = & \frac{6}{n(n - 1)(n - 2)} \left( \frac{(4\alpha^3 - 6\alpha^2 + 1)n^3 - 6(\alpha - 1)^2 n^2 + (2\alpha - 1)n}{6} - n \right) \\
+  & = & \frac{(4\alpha^3 - 6\alpha^2 + 1)n^2 - 6(\alpha - 1)^2 n + 2\alpha - 7}{(n - 1)(n - 2)} \\
+  & = & 4\alpha^3 - 6\alpha^2 + 1.
+\end{eqnarray*}
+The last step holds when $n \rightarrow \infty$.
+
+
+
+
+
+
+
+\section*{Solution to Problem 7-1}
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+
+\stepcounter{enumi}
+
+\item  % b
+We will prove it by induction. As an initialization, notice that $i$ and $j$ 
+never result in values outside $p \ldots r$ after the first iteration of the 
+\kw{while} loop because $A[p] = x$ so that $A[p]$ stands as a sentinel for $i$ 
+and $j$. For the $k$th iteration where $k \geq 2$, we will have at the beginning 
+$i < j$, $A[i] \leq x$ and $A[j] \geq x$ resulting from the previous iteration, 
+so that $A[i]$ stands as a sentinel for $j$, and $A[j]$ stands as a sentinel for 
+$i$, respectively.
+
+
+
+
+\item  % c
+In \proc{Hoare-Partition}, $j$ keeps decreasing in the \kw{while} loop of lines 
+4--11 with its initial value to be $r + 1$. Therefore, \proc{Hoare-Partition} 
+will terminate with $j = r$ only if the \kw{while} loop of lines 4--11 iterates 
+exactly once. But notice that $A[p] = x$ and $i = p - 1$ before the first 
+iteration, so $i$ will always stop at value $p$ in the first iteration of the 
+\kw{while} loop. Thus, in this case, we will result in $i = p$ and $j = r$ in 
+the first iteration of the \kw{while} loop, so that $i < j$, and the \kw{while} 
+loop will have its second iteration due to the \kw{if} statements of lines 
+9--11. This is contratictory to the assumption that the \kw{while} loop iterates 
+exactly once. Thus, it is impossible that \proc{Hoare-Partition} terminates with 
+$j = r$. According to \textit{\textbf{b}}, \proc{Hoare-Partition} will only 
+return a value $j$ such that $p \leq j < r$.
+
+
+
+
+\item  % d
+To show that every element of $A[p \twodots j]$ is less than or equal to every 
+element of $A[j+1 \twodots r]$, we use the following loop invariant:
+\begin{quote}
+Before each iteration of the \kw{while} loop of lines 4--11, every element of 
+$A[p \twodots i-1]$ is less than or equal to $x$ , while every element of 
+$A[j+1 \twodots r]$ is greater than or equal to $x$.
+\end{quote}
+We need to show that this invariant is true prior to the first loop iteration, 
+that each iteration of the loop maintains the invariant, and that the invariant 
+provides a useful property to show correctness when the loop terminates.
+\begin{description}
+
+\item[Initialization:]
+Prior to the first loop iteration, $i = p - 1$ and $j = r + 1$. Thus, $A[p \twodots i-1]$ 
+and $A[j+1 \twodots r]$ are empty, and the loop invariant is trivially satisfied.
+
+\item[Maintenance:]
+For the first iteration, $i$ stops at value $p$ because $A[p] = x$, so that 
+$A[p \twodots i-1]$ is still empty; while $j$ stops decreasing at the first 
+element it meets which is less than or equal to $x$, so every element in $A[j+1 \twodots r]$ 
+is greater than $x$.
+
+For the $k$th iteration where $k \geq 2$, we have at the beginning $i < j$, 
+$A[i] \leq x$ and $A[j] \geq x$ resulting from the previous iteration. During 
+the $k$th iteration, $i$ stops increasing at the first element it meets which 
+is greater than or equal to $x$, while $j$ stops decreasing at the first element 
+it meets which is less than or equal to $x$. Thus, the loop invariant still 
+holds before the next iteration.
+
+\item[Termination:]
+At the termination, we have $j = i$ or $j = i - 1$ because $A[j+1] \geq x$, and 
+the \kw{while} loop won't stop until $i \geq j$. Note that at the termination, 
+we have $A[j] \leq x$ and $A[i] \geq x$ because the exchanging operation isn't 
+executed in the last iteration).
+
+If $j = i$, it can be inferred that $A[j] = x$, then every element in $A[p \twodots j]$ 
+is less than or equal to $x$, and every element in $A[j+1 \twodots r]$ is 
+greater than or equal to $x$ according to the loop invariant. If $j = i - 1$, 
+it also holds trivially. Therefore, every element of $A[p \twodots j]$ is less 
+than or equal to every element of $A[j+1 \twodots r]$ when \proc{Hoare-Partition} 
+terminates.
+
+\end{description}
+
+
+
+
+\item  % e
+Here's the rewritten \proc{Quicksort} procedure using \proc{Hoare-Partition}:
+\begin{codebox}
+\Procname{\proc{Quicksort}$(A,p,r)$}
+\li \If $p < r$
+\li     \Then
+            $q \gets \proc{Hoare-Partition}(A,p,r)$
+\li         \proc{Quicksort}$(A,p,q)$
+\li         \proc{Quicksort}$(A,q+1,r)$
+        \End
+\end{codebox}
+
+\end{enumerate}
+
+
+
+
+
+
+
+\section*{Solution to Problem 7-2}
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+
+\item  % a
+Pr\{$A[i]$ is chosen as the pivot where $p \leq i \leq r$\} $= 1 / (r - p + 1) = 
+1 / n$ because a call to \proc{Random}$(p,r)$ in line 2 in \proc{Randomized-Partition} 
+returns an integer between $p$ and $r$, inclusive, with each such integer being 
+equally likely, while $r - p + 1 = n$. Assuming that all elements are distinct, 
+we have E[$X_i$] = Pr\{$X_i = 1$\} = $1 / n$.
+
+
+
+
+\item  % b
+This is because
+\[
+T(n) = \sum_{q=1}^n X_q(T(q - 1) + T(n - q) + \Theta(n)),
+\]
+Note that there is exactly one $X_q = 1$.
+
+
+
+
+\item  % c
+From equation (7.5), we have
+\begin{eqnarray*}
+\mbox{E}[T(n)]
+& = & \sum_{q = 1}^n \mbox{E}[X_q (T(q - 1) + T(n - q) + \Theta(n))] \\
+& = & \sum_{q = 1}^n (\mbox{E}[X_q T(q - 1)] + \mbox{E}[X_q T(n - q)] + \Theta(n) \mbox{E}[X_q]) \\
+& = & \sum_{q = 1}^n \mbox{E}[X_q T(q - 1)] + \sum_{q - 1}^n \mbox{E}[X_q T(n - q)] + \Theta(n) \sum_{q = 1}^n \mbox{E}[X_q] \\
+& = & 2\sum_{q = 1}^n \mbox{E}[X_q T(q - 1)] + \Theta(n).
+\end{eqnarray*}
+Since the event of the $q$th smallest element being chosen as the pivot is 
+independent of how many time it takes to sort the $q - 1$ smallest elements in 
+the input array, we can continue the above equations as
+\begin{eqnarray*}
+\mbox{E}[T(n)]
+& = & 2\sum_{q = 1}^n \mbox{E}[X_q] \mbox{E}[T(q - 1)] + \Theta(n) \\
+& = & \frac{2}{n}\sum_{q = 1}^n \mbox{E}[T(q - 1)] + \Theta(n).
+\end{eqnarray*}
+
+
+
+
+\item  % d
+\begin{eqnarray*}
+\sum_{k=2}^{n-1} k \lg k
+& = & \sum_{k=2}^{\lceil n/2 \rceil - 1} k \lg k + \sum_{k=\lceil n/2 \rceil}^{n-1} k \lg k \\
+& \leq & \sum_{k=2}^{\lceil n/2 \rceil - 1} k \lg(n/2) + \sum_{k=\lceil n/2 \rceil}^{n-1} k \lg n \\
+& = & \sum_{k=2}^{\lceil n/2 \rceil - 1} k (\lg n - 1) + \sum_{k=\lceil n/2 \rceil}^{n-1} k \lg n \\
+& = & \sum_{k=2}^{n-1} k \lg n - \sum_{k=2}^{\lceil n/2 \rceil - 1} k \\
+& = & \frac{(n-2)(n+1)}{2} \cdot \lg n - \frac{(\lceil n/2 \rceil - 2)(\lceil n/2 \rceil + 1)}{2} \\
+& \leq & \frac{(n-2)(n+1)}{2} \cdot \lg n - \frac{(n/2-2)(n/2+1)}{2} \\
+& = & \frac{1}{2} n^2 \lg n - \left(\frac{n}{2} + 1\right) \lg n - \frac{n^2}{8} + \left(\frac{n}{4} + 1\right) \\
+& \leq & \frac{1}{2} n^2 \lg n - \frac{n^2}{8}.
+\end{eqnarray*}
+The last step holds because $\lg n \geq 1$ for $n \leq 2$ and $n/2 + 1 > n/4 + 1$.
+
+
+
+\item  % e
+Suppose that $\mbox{E}[T(k)] \leq ak \lg k$ holds for all $2 \leq k \leq n - 1$ 
+and some positive constant $a$. Substituting into the recurrence (7.6) yields
+\begin{eqnarray*}
+\mbox{E}[T(n)]
+& \leq & \frac{2}{n} \sum_{k=2}^{n-1} ak \lg k + \Theta(n) \\
+& \leq & \frac{2}{n} \left(\frac{a}{2} n^2 \lg n - \frac{a}{8}n^2\right) + \Theta(n) \\
+& = & an \lg n - \frac{a}{4}n + \Theta(n) \\
+& \leq & an \lg n,
+\end{eqnarray*}
+since we can pick the $a$ large enough so that the quantity $-an/4$ 
+dominates the $\Theta(n)$ term. The second step holds according to equation 
+(7.6). Thus, E$[T(n)] = O(n \lg n)$.
+
+Before proving that E$[T(n)] = \Omega(n \lg n)$, first see that
+\[
+\sum_{k = 1}^{n} k \lg k \geq \sum_{k = 1}^{n} k \lg (n / e).
+\]
+To prove this to be true, let's see
+\begin{eqnarray*}
+\sum_{k = 1}^{n} k \lg k - \sum_{k = 1}^{n} k \lg (n / e)
+&   =  & \sum_{k = 1}^n k \lg (ek / n) \\
+& \geq & \sum_{k = 1}^n \lg (ek / n) \\
+&   =  & \lg \left(\frac{e^n n!}{n^n}\right).
+\end{eqnarray*}
+According to Stirling's approximation, we know that $n! \geq (n / e)^n$. 
+Therefore, $e^n n! / n^n \geq 1$ so that $\lg (e^n n! / n^n) \geq 0$, that is,
+\[
+\sum_{k = 1}^{n} k \lg k - \sum_{k = 1}^{n} k \lg (n / e) \geq 0.
+\]
+Thus, we have
+\begin{eqnarray*}
+\sum_{k = 2}^{n - 1} k \lg k
+&   =  & \sum_{k = 1}^{n} k \lg k - n \lg n \\
+& \geq & \sum_{k = 1}^{n} k (\lg n - \lg e) - n \lg n \\
+&   =  & \frac{1}{2} (n^2 + n)(\lg n - \lg e) - n \lg n \\
+&   =  & \frac{1}{2} n^2 \lg n - \frac{\lg e}{2} n^2 - \frac{1}{2} n \lg n - \frac{\lg e}{2} n.
+\end{eqnarray*}
+Now suppose that $\mbox{E}[T(k)] \geq bk \lg k$ holds for all $2 \leq k \leq n - 1$ 
+and some positive constant $b$. Substituting into the recurrence in equation 
+(7.6) yields
+\begin{eqnarray*}
+\mbox{E}[T(n)]
+& \geq & \frac{2}{n} \sum_{k = 2}^{n - 1} bk \lg k + \Theta(n) \\
+& \geq & \frac{2b}{n} \cdot \left(\frac{1}{2} n^2 \lg n - \frac{\lg e}{2} n^2 - \frac{1}{2} n \lg n - \frac{\lg e}{2} n\right) + \Theta(n) \\
+&   =  & bn \lg n - bn\lg e - b \lg n - b \lg e + \Theta(n) \\
+& \geq & bn \lg n,
+\end{eqnarray*}
+since we can pick the constant $b$ small enough so that the $\Theta(n)$ term 
+dominates the quantity $bn\lg e + b \lg n + b \lg e$. Therefore, we have 
+E$[T(n)] = \Omega(n \lg n)$, so that E$[T(n)] = \Theta(n \lg n)$.
+
+\end{enumerate}
+
+
+
+
+
+
+
+\section*{Solution to Problem 7-3}
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+
+\item  % a
+
+We will argue it by induction. As the base cases, trivially, \proc{Stooge-Sort} 
+correctly sort the input array $A[1 \twodots n]$ if $n = 1$ or $n = 2$. As an 
+induction, suppose that the three recursive calls in lines 6--8 correctly sort 
+their input arrays. After the recursive call in line 6, the one-third largest 
+elements are guaranteed to be in the last two-thirds of array $A[i \twodots j]$, 
+so that after the next recursive call in line 7, they are placed in the last 
+one-third positions of array $A[i \twodots j]$ in sorted order. Therefore, after 
+the last recursive call in line 8, the smallest two-thirds elements are placed 
+in the first two-thirds positions in sorted order, so that the whole array 
+$A[i \twodots j]$ is sorted.
+
+
+
+
+\item  % b
+
+The recurrence for the worst-case running time is
+\[
+T(n) = 3T(\lceil 2n / 3 \rceil) + \Theta(1).
+\]
+According to the master theorem, the asymptotic bound on the recurrence is
+\[
+T(n) = \Theta(n^{\log_{3/2}3}).
+\]
+
+
+
+
+\item  % c
+
+Of course not, its worst-case running time is even longer than that of insersion 
+sort!
+
+\end{enumerate}
+
+
+
+
+
+
+
+\section*{Solution to Problem 7-5}
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+
+\item  % a
+\begin{eqnarray*}
+p_i
+& = & \frac{(i - 1)(n - i)}{\left(\!\begin{array}{c}n \\ 3\end{array}\!\right)} \\
+& = & \frac{6(i - 1)(n - i)}{n(n - 1)(n - 2)}.
+\end{eqnarray*}
+
+
+
+\item  % b
+\begin{eqnarray*}
+& & \lim_{n \rightarrow \infty} (p_{\lfloor (n + 1) / 2 \rfloor} - 1 / n) \\
+& = & \lim_{n \rightarrow \infty} \left( \frac{6(\lfloor (n + 1) / 2 \rfloor - 1)(n - \lfloor (n + 1) / 2 \rfloor)}{n(n - 1)(n - 2)} - \frac{1}{n} \right) \\
+& = & \left(\frac{6(1/2 \cdot (1 - 1/2))}{1 \cdot 2}\right)\lim_{n \rightarrow \infty} \frac{1}{n} \\
+& = & 0.
+\end{eqnarray*}
+
+
+
+\item  % c
+\begin{eqnarray*}
+& & \sum_{i = n / 3}^{2n / 3} p_i - 1 / 3 \\
+& = & \sum_{i = n / 3}^{2n / 3} \frac{6(i - 1)(n - i)}{n(n - 1)(n - 2)} - \frac{1}{3} \\
+& = & \frac{6}{n(n - 1)(n - 2)} \sum_{i = n / 3}^{2n / 3}(-i^2 + (n + 1)i - n) - \frac{1}{3} \\
+& = & \frac{6}{n(n - 1)(n - 2)} \left(\sum_{i = n / 3}^{(n + 1) / 2 - 1}(-i^2 + (n + 1)i - n) +\right. \\
+&   & \left.\sum_{i = (n + 1) / 2 + 1}^{2n / 3}(-i^2 + (n + 1)i - n)\right) - \frac{1}{3} \hspace{1cm} (n \rightarrow \infty) \\
+& \leq & \frac{6}{n(n - 1)(n - 2)} \left(\int_{i = n / 3}^{(n + 1) / 2}(-i^2 + (n + 1)i - n) + \right. \\
+&      & \left.\int_{i = (n + 1) / 2}^{2n / 3}(-i^2 + (n + 1)i - n)\right) - \frac{1}{3} \\
+& = & \frac{6}{n(n - 1)(n - 2)} \int_{i = n / 3}^{2n / 3} (-i^2 + (n + 1)i - n) - \frac{1}{3} \\
+& = & \frac{6(-i^3 / 3 + (n + 1)i^2 / 2 - ni)|_{n / 3}^{2n / 3}}{n(n - 1)(n - 2)} - \frac{1}{3} \\
+& = & 6 \cdot \left(-\frac{1}{3} \cdot \left(\left(\frac{2}{3}\right)^3 - \left(\frac{1}{3}\right)^3\right) + \frac{1}{2} \cdot \left(\left(\frac{2}{3}\right)^2 - \left(\frac{1}{3}\right)^2\right)\right) - \frac{1}{3} \\
+&    & (n \rightarrow \infty) \\
+& = & 6 \cdot \left(-\frac{7}{81} + \frac{3}{18}\right) - \frac{1}{3} \\
+& = & \frac{13}{27} - \frac{1}{3} \\
+& = & \frac{4}{27}.
+\end{eqnarray*}
+
+
+
+\item  % d
+The best case occurs when each call to the partitioning procedure produces two 
+subproblems with each of size no more than $n/2$. This also applies to the 
+median-of-3 method. The median-of-3 method takes additional time to pick two 
+more elements from the input array and to determine the median of the 3 picked 
+elements. However, that additional time is only $\Theta(1)$.
+
+\end{enumerate}
+
+
+
+
+
+
+
+\section*{Solution to Problem 7-6}
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+
+\item  % a
+To take advantage of overlapping intervals, notice that we don't have to sort
+the intervals strictly on $a_i$. If two intervals $i_j$ and $i_k$ overlap and 
+$i_j$ appears earlier in order, there always exist $c_j, c_k \in i_j \cap i_k$ 
+satisfying $c_j \leq c_k$ where $c_k \leq c_j$. Note that in the following 
+implementations, $A$ is the input array of intervals, where $A[j] = i_j = 
+[a_j, b_j]$.
+
+The \proc{Fuzzy-Partition} procedure partitions the input array $A$ into two 
+parts. At the termination, all the intervals in $A[j \twodots r]$ overlap, i.e., 
+there exists a value $x$ such that $x \in [a_k,b_k]$ for all $j \leq k \leq r$. 
+The left endpoint of the overlapping region of $A[j \twodots r]$ is also 
+returned.
+\begin{codebox}
+\Procname{\proc{Fuzzy-Partition}$(A, p, r)$}
+\li $j \gets r$
+\li $\id{max-a} \gets a_r$
+\li $\id{min-b} \gets b_r$
+\li \For $k \gets r - 1$ \Downto $p$
+\li     \Do \Comment Examine the intervals that overlap together with $A[r]$
+\li         \If $a_k \leq \id{min-b}$ and $b_k \geq \id{max-a}$
+\li             \Then
+                    $\id{max-a} \gets \max(\id{max-a}, a_k)$
+\li                 $\id{min-b} \gets \min(\id{min-b}, b_k)$
+\li                 $j \gets j - 1$
+\li                 exchange $A[k] \leftrightarrow A[j]$
+                \End
+        \End
+\li \Return $(j,\id{max-a})$            
+\end{codebox}
+
+The \proc{Partition} procedure is slightly different from that in page 146. This 
+one takes its fourth argument as the pivot, and partitions the intervals in 
+$A[p \twodots r]$ into two parts. At the termination, the left endpoints of the 
+intervals in $A[p \twodots i]$ are all less than or equal to the pivot, while 
+the left endpoints of the intervals in $A[i+1 \twodots r]$ are all greater than 
+the pivot.
+\begin{codebox}
+\Procname{\proc{Partition}$(A,p,r,a_{pivot})$}
+\li $i \gets p - 1$
+\li \For $j \gets p$ \To $r$
+\li     \Do
+            \If $a_j \leq a_{pivot}$
+\li             \Then
+                    $i \gets i + 1$
+\li                 exchange $A[i] \leftrightarrow A[j]$
+                \End
+        \End
+\li \Return $i + 1$
+\end{codebox}
+
+Here comes the sorting algorithm:
+\begin{codebox}
+\Procname{\proc{Fuzzy-Sort}$(A,p,r)$}
+\li \If $p < r$
+\li     \Then
+            $(s,\id{max-a}) \gets \proc{Fuzzy-Partition}(A,p,r)$
+                                                    \label{li:fuzzy-sort-n-begin}
+\li         $t \gets \proc{Partition}(A,p,s-1,\id{max-a})$
+                                                    \label{li:fuzzy-sort-partition}
+\li         \If $t < s$
+\li             \Then
+                    \If $r - s + 1 > s - t$
+\li                     \Then
+                            \For $i \gets t$ \To $s - 1$
+\li                             \Do exchange $A[i] \leftrightarrow A[r - s + i + 1]$
+                                \End
+\li                     \Else
+                            \For $i \gets s$ \To $r$
+\li                             \Do exchange $A[i] \leftrightarrow A[t + i - s]$
+                                \End
+                        \End
+                \End
+                                                    \label{li:fuzzy-sort-n-end}
+\li         \proc{Fuzzy-Sort}$(A,p,t-1)$
+\li         \proc{Fuzzy-Sort}$(A,r-s+t+1,r)$
+        \End
+\end{codebox}
+
+
+
+\item  % b
+Lines \ref{li:fuzzy-sort-n-begin}--\ref{li:fuzzy-sort-n-end} takes $\Theta(n)$ 
+running time. If $a_i$ and $b_i$ are taken randomly from real set, then the 
+probability that any two intervals overlap are quite small, closed to zero 
+(which is equal to the probability that two integers randomly and independently 
+taken from the integer set are equal). Therefore, we can apply the analysis in 
+Problem 7-2 to the expected running time of \proc{Fuzzy-Sort}, which is 
+consequently $\Theta(n \lg n)$.
+
+When all of the intervals overlap, \proc{Fuzzy-Sort} won't make any recursive 
+call because after the execution of lines \ref{li:fuzzy-sort-n-begin}--\ref{li:fuzzy-sort-partition} 
+in \proc{Fuzzy-Sort}, we have $t = s = p$. In this case, the running time of 
+\proc{Fuzzy-Sort} is $\Theta(n)$.
+
+\end{enumerate}
+
+\end{document}
+

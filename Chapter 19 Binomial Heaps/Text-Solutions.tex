@@ -1,0 +1,168 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{clrscode}
+\setlength\mathindent{0em}
+\parskip = 7bp
+\begin{document}
+
+\section*{Solution to Exercise 19.1-3}
+
+Assume that in any $B_{k-1}$, a node at depth $i$ has $j = k-1-i$ 1's
+in its binary representation. When two $B_{k-1}$ form a $B_k$, each
+node label in the right $B_{k-1}$ is increased by $2^{k-1}$, since the
+left $B_{k-1}$ contains $2^{k-1}$ nodes. This will set the $(k-1)$-th
+bit of the label of each node in the right $B_{k-1}$ to 1, so that one
+more 1 appears in its binary representation. Also, the depth of each
+node in the left $B_{k-1}$ is increased by 1. Thus, the nodes in depth
+$i$ of the right $B_{k-1}$ will be at the same level in $B_k$ with the
+nodes in depth $i-1$ of the left $B_{k-1}$, except that the root of
+the right $B_{k-1}$ becomes the root of $B_k$, which has $k$ 1's in
+its binary represantation. Therefore, in $B_k$, a node at depth $i$
+has $j = k - i$ 1's in its binary representation.
+
+The base case of the assumption in which $k - 1 = 0$ trivially holds
+true. Therefore by induction, in any $B_k$, a node at depth $i$ has
+$j = k - i$ 1's in its binary representation.
+
+According to the third property of Lemma 19.1, there are
+$\left(\begin{array}{c}k \\ k - j\end{array}\right)$ binary
+$k$-strings that contain exactly $j$ 1's.
+
+The last statement can also be shown by induction in the way described
+above similarly.
+
+
+
+
+
+
+\section*{Solution to Exercise 19.2-5}
+
+If all the keys in the heap are $\infty$, then the procedure will
+return \const{nil}. To make the procedure work in such a situation,
+change the $<$ symbol in line 5 to $\leq$.
+
+
+
+
+
+
+\section*{Solution to Exercise 19.2-10}
+
+If $n$ is a power of 2, then the input heap contains only one binomial
+tree, so that \proc{Binomial-Heap-Insert} and
+\proc{Binomial-Heap-Minimum} runs in $O(1)$ time on any bionomial
+heap of size $n$.
+
+
+
+
+
+
+\section*{Solution to Problem 19-1}
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+\stepcounter{enumi}  % a
+\stepcounter{enumi}  % b
+\stepcounter{enumi}  % c
+\stepcounter{enumi}  % d
+\stepcounter{enumi}  % e
+
+\item  % f
+
+See the \proc{Union} procedure below:
+
+\begin{codebox}
+\Procname{$\proc{Union}(H_1, H_2)$}
+\li create a new node $r$
+\li \If $\id{height}[H_1] = \id{height}[H_2]$
+\li     \Then
+            make $H_1$ the left child of $r$, make $H_2$ the
+\zi         the right child of $r$, and make $r$ the root of
+\zi         a new 2-3-4 heap $H$
+\li         \Return $H$
+        \End
+\li assume without loss of generality that
+    $\id{height}[H_1] > \id{height}[H_2]$
+\li make $H_2$ the right child of $r$
+\li $x \gets \mbox{the node which is in the rightmost path of } H_1$
+\zi \>$\mbox{ and whose height is equal to } \id{height}[H_2] + 1$
+\li \While $x$ is full
+\li     \Do
+            remove the rightmost subtree in $x$ from $x$ and
+\zi         \>make it the left child of $r$, the rightmost element
+\zi         \>in $x$ is also deleted
+\li         create a new node $s$ and make $r$ be
+\zi         \>the right child of $s$
+\li         update $\id{small}[x]$, $\id{small}[r]$ and
+              $\id{small}[s]$
+\li         $r \gets s$
+\li         \If $p[x] = \const{nil}$
+\li             \Then
+                    create a new node $y$ and
+\zi                 \>make $x$ be the left child of $y$
+\li                 $\id{small}[y] \gets \id{small}[x]$
+\li                 $x \gets y$
+                \End
+\li         $x \gets p[x]$
+        \End  % while
+\li \If the left subtree of $x$ is not empty but
+\zi     \>the right subtree is empty
+\li     \Then
+            delete the node $r$ and make its former right subtree
+\zi         \>be the right subtree of $x$
+\li     \Else
+            merge $x$ and $r$ so that the only one element of $r$
+\zi         \>be the rightmost element in $x$
+        \End
+\li \While $x \neq \const{nil}$
+\li     \Do
+            update $\id{small}[x]$
+\li         $x \gets p[x]$
+        \End
+\li make $x$ the root of a new 2-3-4 heap $H$
+\li \Return $H$
+\end{codebox}
+
+\end{enumerate}
+
+
+
+
+
+
+\section*{Solution to Problem 19-2}
+
+Each $V_i$ can be maintained by a binomial heap, within which each
+node $v$ represents a vetex. $\id{key}[v]$ is the minimum weight of
+any edge connecting $v$ to an ajacent vertex.
+
+Each $E_i$ can also be maintained by a binomial heap, within which
+each node $e$ represents an edge in $E_i$. $\id{key}[e]$ is the weight
+of $e$. There are two satellite fields $v_1[e]$ and $v_2[e]$, which
+point to the vetex node connected by the edge.
+
+We also need to add an operation beyond the mergeable-heap operations
+given in Figure 19.1 of the textbook for the vertex binomial heaps:
+given a vertex node, we shall return the head of the heap it belongs
+to. This operation is used to support the \If statement in line 9 of
+\proc{MST}. In order to support this operation, we need to doubly link
+the roots in a binomial heap. It takes $O(\lg n)$ time to find the
+head for a binomial heap of $n$ elements.
+
+Let's denote the number of vertices and the number of edges in the
+graph by $V$ and $E$ respectively. The binomial heap constructions are
+done in the \For loop of \proc{MST}. The vertex heaps are constructed
+in $\Theta(E)$ time in total. Each $E_i$ can be constructed by one
+\proc{Make-Heap} and multiple \proc{Insert} operations. So the edge
+heaps are constructed in $O(E \lg E)$ time in total.
+
+There are $2E$ edge nodes in total, and each node is extracted at most
+once, which are done in line 7 of \proc{MST}, with each extraction
+take $O(\lg E)$. Before the \If statement is performed, we need to
+find the head of $V_i$ and $V_j$, which takes $O(\lg V)$ time. Merging
+two vertex heaps every time in line 11 takes $O(\lg V)$, while merging
+two edge heaps every time in line 12 takes $O(\lg E)$. Therefore, the
+total running time is $O(E \lg V + E \lg E)$.
+
+\end{document}

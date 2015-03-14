@@ -1,0 +1,55 @@
+Theorem:
+
+No program can compress without loss *all* files of size >= N bits, for any given integer N >= 0. 
+
+Proof: 
+
+Assume that the program can compress without loss all files of size >= N bits. Compress with this program all the 2^N files which have exactly N bits. All compressed files have at most N-1 bits, so there are at most (2^N)-1 different compressed files [2^(N-1) files of size N-1, 2^(N-2) of size N-2, and so on, down to 1 file of size 0]. So at least two different input files must compress to the same output file. Hence the compression program cannot be lossless. The proof is called the "counting argument". It uses the so-called pigeon-hole principle: you can't put 16 pigeons into 15 holes without using one of the holes twice. Much stronger results about the number of incompressible files can be obtained, but the proofs are a little more complex.
+
+Read more: http://www.faqs.org/faqs/compression-faq/part1/section-8.html#ixzz0Vki1iCJQ
+
+
+
+What is the theoretical compression limit?
+
+This question can be understood in two different ways:
+
+(a) For a given compressor/decompressor, what is the best possible lossless
+    compression for an arbitrary string (byte sequence) given as input?
+
+(b) For a given string, what is the best possible lossless
+    compressor/decompressor?
+
+For case (a), the question is generally meaningless, because a specific
+compressor may compress one very large input file down to a single bit, and
+enlarge all other files by only one bit.  There is no lossless compressor that
+is guaranteed to compress all possible input files. If it compresses some
+files, then it must enlarge some others.  This can be proven by a simple
+counting argument (see item 9).  In case (a), the size of the decompressor is
+not taken into account for the determination of the compression ratio since the
+decompressor is fixed and it may decompress an arbitrary number of files of
+arbitrary length.
+
+For case (b), it is of course necessary to take into account the size of the
+decompressor. The problem may be restated as "What is the shortest program P
+which, when executed, produces the string S?".  The size of this program
+is known as the Kolmogorov complexity of the string S.  Some (actually most)
+strings are not compressible at all, by any program: the smallest
+representation of the string is the string itself.  On the other hand, the
+output of a pseudo-random number generator can be extremely compressible, since
+it is sufficient to know the parameters and seed of the generator to reproduce
+an arbitrary long sequence.
+
+References: "An Introduction to Kolmogorov Complexity and its Applications",
+   Ming Li and Paul Vitanyi, 2nd edition, Springer-Verlag, ISBN 0-387-94868-6
+   http://www.cwi.nl/~paulv/kolmogorov.html
+
+If you don't want to read a whole book, I recommend the excellent lecture
+"Randomness & Complexity in Pure Mathematics" by G. J. Chaitin:
+  http://www.cs.auckland.ac.nz/CDMTCS/chaitin/ijbc.html
+The decimal and binary expansions of Chaitin's number Omega are examples of
+uncompressible strings. There are more papers on
+http://www.cs.auckland.ac.nz/CDMTCS/chaitin/
+
+
+Read more: http://www.faqs.org/faqs/compression-faq/part2/section-4.html#ixzz0VkiOjsRz

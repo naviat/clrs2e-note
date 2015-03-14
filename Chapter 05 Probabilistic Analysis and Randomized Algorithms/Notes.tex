@@ -1,0 +1,47 @@
+\documentclass[a4paper, fleqn]{article}
+
+\usepackage{clrscode}
+
+\setlength\mathindent{0em}
+\parskip = 7bp
+
+\begin{document}
+
+\section{\proc{Randomize-In-Place} is similar to selection sort}
+
+\proc{Randomize-In-Place} behaves quite the same as the \textbf{\textit{selection 
+sort}} algorithm described in Exercise 2.2-2, except that it randomly chooses one 
+element but not the smallest element in $A[i \twodots n]$ and exchange it with 
+$A[i]$. Therefore, for any particular permutation $\langle\ x_1, x_2, \ldots, x_n 
+\rangle$, $x_i$ is put in position $i$ with probability $1 / (n - i + 1)$, and 
+the permutation occurs with probability $1/n!$.
+
+
+\section{Is it rigorous of the proof of the lower bound of streak?}
+
+In Subsection 5.4.3, the textbook gives the probability that every one of the 
+$\lfloor (\lg n) / 2 \rfloor$ groups fails to be a streak of length $\lfloor 
+(\lg n) / 2 \rfloor$ (let's denote it by $P_1$ on page 112, and uses it to bound 
+the probability that the longest streak exceeds $\lfloor (\lg n) / 2 \rfloor$.
+
+However, $P_1$ is not the probability that the longest streak of consecutive 
+heads is less than $\lfloor (\lg n) / 2 \rfloor$ (let's denote this probability 
+by $P_2$)! Imagine that two neighboring group both fail to be a streak of length 
+$\lfloor (\lg n) / 2 \rfloor$, but the former group has a streak of $t$ in its 
+final tosses, where $1 < t < \lfloor (\lg n) / 2 \rfloor$, and the later group 
+has a streak of $\lfloor (\lg n) / 2 \rfloor - t + 1$ in its initial tosses, 
+then there will be a sreak that is longer than $\lfloor (\lg n) / 2 \rfloor$. 
+Therefore, the events corresponding to $P_2$ is more ``strict'', i.e. they are 
+subsets of the events that correspond to $P_1$, and $P_2 \leq P_1$. Thus, the 
+probability that the longest streak is \textit{at least} $\lfloor (\lg n) / 2 
+\rfloor$ is
+\begin{eqnarray*}
+\sum_{j = \lfloor (\lg n) / 2 \rfloor}^n \mbox{Pr}\{L_j\} & = & 1 - P_2 \\
+& \geq & 1 - P_1 \\
+& = & 1 - O(1/n).
+\end{eqnarray*}
+So, there's no big problem in the proof of the lower bound. But the word 
+``exceeds'' in line 3 on page 113 should be changed to ``at least'', and so is 
+the corresponding computing procedure of E$[L]$ below.
+
+\end{document}

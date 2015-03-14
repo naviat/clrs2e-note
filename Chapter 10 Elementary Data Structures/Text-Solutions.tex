@@ -1,0 +1,32 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{clrscode}
+\setlength\mathindent{0em}
+\parskip = 7bp
+\begin{document}
+
+\section*{Solution to Exercise 10.2-8}
+
+Notice that the XOR operation has the properties of
+\[0 \mbox{ XOR } a = a\]
+and
+\[a \mbox{ XOR } (a \mbox{ XOR } b) = b.\]
+Therefore, if we have object $x$ and its successor $y$ in the linked
+list, then we can get the successor of $y$ by the operation of $x
+\mbox{ XOR } \id{np}[y]$, and the predecessor of $x$ by the operation
+of $\id{np}[x] \mbox{ XOR } y$.  Note that \id{np}[\id{head}[$L$]] =
+\id{next}[\id{head}[$L$]] because \id{prev}[\id{head}[$L$]] =
+\const{NIL} = 0.
+
+Thus, to get an object's successor in $O(1)$ time, we must have its
+predecessor in advance, except for the head element; to get an
+object's predecessor in $O(1)$ time, we must have its successor in
+advance, except for the tail element. This means that the
+standard \proc{Delete} operation won't work in $O(1)$ time any more
+unless we modify it to take the successor or predecessor of $x$ as a
+second parameter.
+
+The reversing is quite simple. To reverse such a list in $O(1)$ time,
+we should add another attribute of $L$ pointing to the tail element of
+$L$, i.e., \id{tail}[$L$]. The reversing operation is just swapping
+\id{head}[$L$] and \id{tail}[$L$].
+\end{document}

@@ -1,0 +1,174 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{clrscode}
+\setlength\mathindent{0em}
+\parskip = 7bp
+\begin{document}
+
+\section*{Solution to Exercise 12.2-8}
+
+For the purpose of convenience, we will assume that all the keys are
+distinct. Actually, if two keys are the same in a binary search tree,
+we can distinct them by their positions in the sorted order got by the
+in-order walk through the tree.
+
+Suppose that node $s$ has no less than $k$ successors and we start at
+node $s$ to make $k$ successive calls to \proc{Tree-Successor}. There
+are at least $k$ tree edges these $k$ calls must traverse. If the $k$
+calls traverse $l > k$ tree edges, then they also traverse $m = l-k$
+nodes whose keys are smaller than that of $s$. If we can prove that,
+for any pair $(p,q)$ where $p$, $q$ are two distinct nodes among these
+$m$ nodes, the depths of $p$ and $q$ are different, then we will have
+$m \leq h$, so that the $k$ succesive calls to \proc{Tree-Successor}
+take $\Theta(k+m) = O(k+h)$ time since each of the $k+m$ tree edges is
+traversed at most twice, according to the solution to Exercise 12.2-7.
+
+We will prove this by contradiction. Three assumptions are given:
+\begin{itemize}
+\item
+We have two distinct nodes $p$ and $q$ at the same depth whose keys
+are both smaller than that of $s$.
+
+\item
+$p$ is on the left and $q$ is on the right for convenience.
+
+\item
+$p$ is traversed upward in the call to \proc{Tree-Successor} on some
+node $p'$.
+\end{itemize}
+Since $p$ and $q$ is at the same depth, there must be some node $t$
+whose left child is an ancestor of $p$ and whose right child is an
+ancestor of $q$. Therefore, $t$ will be returned by the call to
+\proc{Tree-Successor} on node $p'$ as the successor of $p'$, then we
+have $\id{key}[t] > \id{key}[p']$. But since the right child of $t$ is
+an ancestor of $q$, we have $\id{key}[t] < \id{key}[q]$, so that
+$\id{key}[s] \leq \id{key}[p'] < \id{key}[t] < \id{key}[q]$, which is
+contradictory to the assumption that $\id{key}[q] <
+\id{key}[s]$. Therefore, if the keys of $p$ and $q$ are all smaller
+than that of $s$ and both of them are traversed in the $k$ successive
+call to \proc{Tree-Successor}, we have that the depths of $p$ and $q$
+are different.
+
+
+
+
+\section*{Solution to Exercise 12.3-3}
+
+From Section 12.1 we know that it takes $\Theta(n)$ time to walk an
+$n$-node binary search tree. Therefore, the running time of such a
+sorting algorithm to sort an $n$-element array $A$ relies on that of
+the $n$ repeated \proc{Tree-Insert} operations.
+
+Since each \proc{Tree-Insert} begins at the root of the tree and
+traces a path downward, we have that the maximum number of tree edges
+a \proc{Tree-Insert} operation among the $n$ repeated operations
+traverses is the height of the resulted binary search tree, denoted by
+$h$. Then the total number of tree edges these $n$ repeated operations
+traverse is $m = \sum_{i=1}^h i \cdot n_i$, where $n_i$ is the number
+of nodes on depth $i$, so that $\sum_{i=1}^hn_i = n$. From Exercise
+B.5-4, we have $h \geq \lfloor \lg n \rfloor$. Also, we have $n_i \leq
+2^i$ for any binary tree. Therefore, when $n$ repeated
+\proc{Tree-Insert} operations result in a binary tree of height
+$\Theta(\lg n)$, we have the best case:
+\begin{eqnarray*}
+m & = & \sum_{i=1}^{\lfloor \lg n \rfloor - 1} i \cdot 2^i +
+\lfloor \lg n \rfloor \cdot (n - \sum_{i=0}^{\lfloor \lg n \rfloor - 1} 2^i) \\
+  & = &  \sum_{i=1}^{\lfloor \lg n \rfloor - 1} i \cdot 2^i + \lfloor
+\lg n \rfloor \cdot (n - 2^{\lfloor \lg n \rfloor} + 1) \\
+  & = & \Theta(n \lg n).
+\end{eqnarray*}
+
+
+
+
+\section*{Solution to Exercise 12.3-5}
+
+The operation of deletion is commutative if $x$ and $y$ are not
+neighbours in the sorted order got by an inorder tree walk. But if $x$
+and $y$ are neighbours, the operation of deletion may not be
+commutative. A counterexample is shown in the unofficial solution.
+
+
+
+
+\section*{Solution to Exercise 12.4-5}
+
+From Section 7.2, we know that any split of constant proportionality
+of $t$-to-1 on each call to the partitioning algorithm makes the
+running time of quicksort be $O(n \lg n)$. Each unique $t$ corresponds
+to a unique one of the $n!$ input permutations.
+
+If we can prove that the ratio of the number of unique $t$ to $n!$ is
+$\Omega(1-1/n^k)$, then the proof is achieved.
+
+
+
+
+\section*{Solution to Problem 12-1}
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+\stepcounter{enumi}  % a
+\stepcounter{enumi}  % b
+\stepcounter{enumi}  % c
+
+\item  % d
+This strategy is similar to that of \textit{\textbf{b}}, except that
+\id{b}[\id{x}] is determined randomly. Informally, if \id{b}[\id{x}]
+is checked $c$ times, then it will show \const{false} about $c/2$
+times, and \const{true} about $c/2$ times on average, which will
+result in the situation the same as that in
+\textit{\textbf{b}}. Therefore, the average-case performance is
+$\Theta(n \lg n)$.
+\end{enumerate}
+
+
+
+
+\section*{Solution to Problem 12-4}
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+\stepcounter{enumi}  % a
+
+\item  % b
+Let $B_m(x) = \sum_{n=0}^mb_nx^n$, then
+\begin{eqnarray*}
+B_m(x)^2 & = & \left(\sum_{n=0}^mb_nx^n\right)^2 \\
+        & = & \sum_{i=0}^{2m}\sum_{j=0}^ib_jb_{i-j}x^i \\
+        & = & \sum_{i=0}^{2m}b_{i+1}x^i \\
+        & = & (B_{2m+1}(x)-1)/x.
+\end{eqnarray*}
+Thus, $B(x)^2 = B_\infty(x)^2 = (B_\infty(x)-1)/x = (B(x)-1)/x$, so
+that $B(x) = xB(x)^2+1$.
+
+\item  % c
+\textbf{Solution using the Taylor expansion:}
+
+Let's first obtain the Taylor expansion of $\sqrt{1-4x}$ around $x =
+0$. Note that for $f(x) = \sqrt{1-4x}$, we have $f^{(0)}(0) = 1$ and
+\begin{eqnarray*}
+f^{(k)}(0) & = &
+\left.-2^{k}(2k-1)!!(1-4x)^{\frac{1}{2}-k}\right|_{x=0} \\
+& = & -2^{k}(2k-1)!! \\
+& = & -\frac{2^kk!(2k-1)!!}{k!} \\
+& = & -\frac{(2k)!}{k!}, \hspace{1cm} k \geq 1.
+\end{eqnarray*}
+Therefore, the Taylor expansion of $f(x) = \sqrt{1-4x}$ around $x = 0$
+is
+\begin{eqnarray*}
+f(x) & = & \sum_{k=0}^\infty \frac{f^{(k)}(0)}{k!} x^k \\
+     & = & 1 - \sum_{k=1}^\infty \frac{(2k)!}{k!k!} x^k,
+\end{eqnarray*}
+such that
+\begin{eqnarray*}
+B(x) & = & \frac{1}{2x}(1-\sqrt{1-4x}) \\
+     & = & \frac{1}{2x} \sum_{k=1}^\infty \frac{(2k)!}{k!k!} x^k \\
+     & = & \sum_{k=1}^\infty \frac{(2k-1)!}{k!(k-1)!} x^{k-1} \\
+     & = & \sum_{n=0}^\infty \left(\!\!\!\begin{array}{c}2n+1
+  \\ n\end{array}\!\!\!\right) x^n.
+\end{eqnarray*}
+Thus, we have
+\[b_n = \left(\!\!\!\begin{array}{c}2n+1 \\ n\end{array}\!\!\!\right)\]
+
+\textbf{Solution using (C.4):}
+\end{enumerate}
+
+\end{document}

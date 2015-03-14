@@ -1,0 +1,279 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{amsmath}
+\usepackage{clrscode}
+\usepackage{hyperref}
+\setlength\mathindent{0em}
+\parskip = 7bp
+
+\title{Solutions for Chapter 20}
+\author{Zhixiang Zhu
+\\\href{mailto:zzxiang21cn@hotmail.com}{zzxiang21cn@hotmail.com}}
+\date{January 25, 2011}
+\begin{document}
+
+\maketitle
+
+\section*{Solution to Exercise 20.2-3}
+
+A Fibonacci heap remains a collection of unordered binomial trees
+after any mergeable-heap operation is performed. Therefore, $D(n)$ is
+at most $\lfloor \lg n \rfloor$.
+
+
+
+
+
+\section*{Solution to Exercise 20.2-4}
+
+The inserion and union operations without consolidation both take
+$O(1)$ time. The consolidation operation takes $O(D(n[H]) + t(H))$
+time, $H$ is the input heap of consolidation. Therefore, the new
+insertion and union operations both take $O(D(n[H]) + t(H))$ actual
+time, where $H$ is the heap resulted from the insertion or union
+operation. Since the amortized costs of the original insertion and
+union operations are already $O(1)$, the new operations do no good to
+it. Actually they make the actual running time even worse.
+
+
+
+
+
+
+\section*{Solution to Exercise 20.3-1}
+
+If $x$ is a marked child of some root, then $x$ will become a marked
+root when the parent of $x$ is deleted and $x$ does not become a child
+of any other node.
+
+
+
+
+
+
+\section*{Solution to Exercise 20.3-2}
+
+Suppose that we consecutively invoke \proc{Fib-Heap-Decrease-Key} $n$
+times on a Fibonacci heap of $n$ elements. As we have known, the only
+non-constant time operation in \proc{Fib-Heap-Decrease-Key} is
+\proc{Cascading-Cut}. Each recursive \proc{Cascading-Cut} (those which
+are neither the top nor the bottom in the invocation stack) invokes
+\proc{Cut} on a node, with the node being the $x$ input of \proc{Cut}.
+Therefore, the only non-constant time operation in
+\proc{Fib-Heap-Decrease-Key} is actually the multiple \proc{Cut}
+procedures. Since the $x$ input node of \proc{Cut} will become a root
+and \proc{Cut} won't be invoked on a root with the root being $x$,
+\proc{Cut} is invoked at most $n$ times in total. Therefore, the total
+time of the $n$ invocations of \proc{Fib-Heap-Decrease-Key} is $O(n)$,
+and the amortized time of \proc{Fib-Heap-Decrease-Key} is $O(n) / n =
+O(1)$.
+
+
+
+
+
+
+\section*{Solution to Exercise 20.4-1}
+
+After we create an empty Fibonacci heap, we insert a node into the
+heap. After the insertion, we perform a sequence of the following
+operations:
+
+\noindent
+I2, E, I2, E, I2, E, ...
+
+\noindent
+where I2 stands for inserting two nodes whose keys are smaller than
+the currnet minimum key in the heap, that is, suppose the current
+minimum key in the heap is $A$, then we insert two nodes whose keys
+are $B$ and $C$, where $B < A$ and $C < A$; E stands for extracting
+the node with the minimum key.
+
+After $n-1$ I2 and $n-1$ E operations, we will get a Fibonacci heap in
+which there's only one tree, which is just a linear chain of $n$
+nodes.
+
+
+
+
+
+
+\section*{Solution to Execise 20.4-2}
+
+As long as $k$ is a positive integer, we will have $D(n) = O(\lg
+n)$. The proof is given as follows.
+
+If a node $x$ is cut as soon as it loses its $k'$th child, then the
+last sentence of lemma $20.1$ in the text will be changed to: ``Then,
+$\id{degree}[y_i] \geq 0$ for $i = 1, 2, \ldots, k' - 1$ and
+$\id{degree}[y_i] \geq i - k'$ for $i = k', k' + 1, \ldots, k$.''
+Therefore, the the first half of the proof of lemma 20.3 will also be
+changed to
+\begin{align*}
+\mbox{size}(x) &\geq s_k \\
+               &\geq k' + \sum_{i = k'}^k s_{\id{degree}[y_i]} \\
+	       &\geq k' + \sum_{i = k'}^k s_{i - k'}.
+\end{align*}
+(to be continued...)
+
+
+
+
+
+
+\section*{Solution to Problem 20-1}
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+
+\item  % a
+
+The $p$ fields of $x$'s children should be set to \const{nil} in line
+7, which takes $\Theta(\id{degree}[x])$ actual time.
+
+\item  % b
+
+$O(\id{degree}[x] + c)$.
+
+\item  % c
+
+The potential of $H'$ is at most $t(H) + c + \id{degree}[x] + 2(m(H) -
+c + 2)$.
+
+\item  % d
+
+The change in potential is at most
+\begin{align*}
+&(t(H) + c + \id{degree}[x] + 2(m(H) - c + 2)) - (t(H) + 2m(H)) \\
+&\qquad = \id{degree}[x] + 4 - c.
+\end{align*}
+
+\end{enumerate}
+
+
+
+
+
+
+\section*{Solution to Problem 20-2}
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+
+\item  % a
+
+Here's the \proc{Fib-Heap-Change-Key} procedure:
+
+\begin{codebox}
+\Procname{$\proc{Fib-Heap-Change-Key}(H, x, k)$}
+\li \If $k > \id{key}[x]$
+\li   \Then
+        $\id{key}[x] \gets k$
+\li     \For each child $y$ in the child list of $x$
+	\label{li:20-2a-for-1-begin}
+\li       \Do
+	    \If $\id{key}[y] < \id{key}[x]$
+\li           \Then
+	        $\proc{Cut}(H, y, x)$
+\li             $\proc{Cascading-Cut}(H, x)$
+	      \End
+	  \End
+	\label{li:20-2a-for-1-end}
+\li     \If $x = \id{min}[H]$
+\li       \Then
+            $\proc{Consolidate}(H)$
+\li         \For each node $z$ in the root list of $H$
+            \label{li:20-2a-for-2-begin}
+\li           \Do
+                \If $\id{key}[z] < \id{key}[\id{min}[H]]$
+\li               \Then
+                    $\id{min}[H] \gets z$
+                  \End
+              \End
+            \label{li:20-2a-for-2-end}
+          \End
+\li   \Else
+        $\proc{Fib-Heap-Decrease-Key}(H, x, k)$
+      \End
+\end{codebox}
+
+Let $H$ denote the Fibonacci heap just prior to the
+\proc{Fib-Heap-Change-Key} operation.
+
+Now let's determine the amortised cost of \proc{Fib-Heap-Change-Key}
+in the case of $k > \id{key}[x]$.
+
+If $x = \id{min}[H]$, there will be no recursive calls of
+\proc{Cascading-Cut} since $p[x] = \const{nil}$. Therefore, the \For
+loop of lines \ref{li:20-2a-for-1-begin}--\ref{li:20-2a-for-1-end}
+contributes an actual cost of $O(D(n))$, since there're at most $D(n)$
+children of $x$. According to the analysis in section 20.2 of the
+textbook, the \proc{Consolidate} procedure contributes an actual cost
+$O(D(n) + t(H))$, so as the \For loop of lines
+\ref{li:20-2a-for-2-begin}--\ref{li:20-2a-for-2-end}. Therefore, the
+actual cost of \proc{Fib-Heap-Change-Key} when $x = \id{min}[H]$ is
+$O(D(n) + t(H))$.
+
+The potential before changing the key is $t(H) + 2m(H)$, and the
+potential afterward is at most $(D(n) + 1) + 2m(H)$, since at most
+$D(n) + 1$ roots remain and no nodes become marked during the
+operation. The amortised cost when $x = \id{min}[H]$ is thus at most
+\begin{align*}
+&O(D(n) + t(H)) + ((D(n) + 1) + 2m(H)) - (t(H) + 2m(H)) \\
+&\qquad = O(D(n)) + O(t(H)) - t(H) \\
+&\qquad = O(D(n)),
+\end{align*}
+since we can scale up the units of potential to dominate the constant
+hidden in $O(t(H))$.
+
+If $x \neq \id{min}[H]$, the only cost occurs in the \For loop of
+lines \ref{li:20-2a-for-1-begin}--\ref{li:20-2a-for-1-end}, in which
+case the actual cost is $O(D(n) + c)$, where $c$ is the number of
+times \proc{Cascading-Cut} is recursively called.
+
+We next compute the change in potential. Each recursive call of \\
+\proc{Cascading-Cut}, except for the last one, cuts a marked node and
+clears the mark bit. The children of $x$ may also be cut. Afterward,
+there are at most $t(H) + D(n) + c - 1$ trees (the original $t(H)$
+trees, $D(n)$ trees produced by cutting $x$'s children, and $c - 1$
+trees produced by cascading cuts), and at most $m(H) - c + 2$ marked
+nodes ($c - 1$ were unmarked by cascading cuts and the last call of
+\proc{Cascading-Cut} may have marked a node). The change in potential
+is therefore at most
+\begin{align*}
+&((t(H) + D(n) + c - 1) + 2(m(H) - c + 2)) - (t(H) + 2m(H)) \\
+&\qquad= D(n) + 4 - c
+\end{align*}
+Thus, the amortised cost of \proc{Fib-Heap-Change-Key} when $x \neq
+\id{min}[H]$ is at most
+\[O(D(n) + c) + D(n) + 4 - c = O(D(n)),\]
+since we can scale up the units of potential to dominate the constant
+hidden in $O(c)$.
+
+Therefore, the amortised cost of \proc{Fib-Heap-Change-Key} for the
+case in which $k$ is greater than $\id{key}[x]$ is $O(D(n))$. Because
+a node is cut as soon as it loses two children, lemma $20.1$ in the
+textbook still holds, so do lemma 20.3 and corollary 20.4. Thus, the
+amortised cost of \proc{Fib-Heap-Change-Key} for the case in which $k$
+is greater than $\id{key}[x]$ is $O(\lg n)$.
+
+According to section 20.3 of the textbook, the amortised cost is
+$O(1)$ for the case in which $k$ is equal to or less than
+$\id{key}[x]$.
+
+
+
+\item  % b
+
+We can modify the data structure to maintain a list of leaves. As long
+as the number of deleted nodes is smaller than $\min(r, n[H])$, we
+will delete a leaf from the list. Each time a leaf is deleted, the
+\proc{Cascading-Cut} procedure must be called on its parent to keep
+lemma $20.1$ in the textbook true, so that the amortised running time
+of any other Fibonacci-heap operations won't be changed. Also, each
+time a leaf is added or deleted, the leaf list must be updated. The
+potential function doesn't need to be modified. The amortised cost of
+$\proc{Fib-Heap-Prune}(H, r)$ is $O(\min(r, n[H]))$.
+
+\end{enumerate}
+
+\end{document}

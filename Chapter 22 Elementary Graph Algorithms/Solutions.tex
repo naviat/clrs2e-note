@@ -1,0 +1,489 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{clrscode}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\setlength\mathindent{0em}
+\parskip = 5bp
+
+\title{Solutions for Chapter 22}
+\author{Zhixiang Zhu  \\\href{mailto:zzxiang21cn@hotmail.com}{zzxiang21cn@hotmail.com}}
+
+\begin{document}
+
+\maketitle
+
+\section*{Solution to Exercise 21.1-1}
+
+Computing the out-degree of every vertex takes $\Theta(V + E)$. Computing the in-degrees also takes $\Theta(V + E)$.
+
+
+\section*{Solution to Exercise 22.1-3}
+
+Just traverse all the edges and do the reversion. It takes $\Theta(V + E)$ for the adjacency-list representation, and $\Theta(V^2)$ for the adjacency-matrix representation.
+
+
+\section*{Solution to Exercise 22.1-4}
+
+It is necessary to traverse the adjacency-list of $G$ to complete the task. The basic idea is:
+
+\begin{enumerate}
+
+\item  % 1
+
+Create an empty adjacency-list $L$ for $G'$
+
+\item  % 2
+
+Traverse the adjacency-list of $G$. When visiting each edge of $G$, check that whether its undirected counterpart is already contained in $L$, and whether it is a self-loop; if both answers are no, then insert the undirected counterpart into $L$.
+
+\end{enumerate}
+
+While traversing $G$ itself already takes $O(V + E)$ running time, we have to think of a way to make the checking of each edge in step 2 take constant time. This can be accomplished by maintaining a boolean array of size $|V|$, denoted by $A[1..|V|]$. Of course, this means that we need to number all the vertices from 1 to $|V|$. The detailed procedure is as follows:
+
+\begin{codebox}
+\Procname{$\proc{Shrink-Multigraph}(G)$}
+\li create a graph $G'$ consisting of $V[G]$ but no edges
+\li create a boolean array $A[1..|V|]$ and initialize all its elements to \const{true}
+\li \For each vertex $u \in V[G]$
+\li    \Do
+         \For each vertex $v \in \id{Adj}[u]$
+\li         \Do
+              \If $A[v]$ and $u \neq v$
+\li             \Then
+                  insert edge $(u, v)$ into $G'$
+\li               $A[v] \gets \const{false}$
+                \End
+            \End
+\li      \For each vertex $v \in \id{Adj}[u]$
+\li         \Do
+              $A[v] \gets \const{true}$
+            \End
+      \End
+\li \Return $G'$
+\end{codebox}
+
+
+\section*{Solution to Exercise 22.1-5}
+
+\textcolor{red}{This solution is wrong. See Philip Bille's for the correct one.}
+
+\begin{codebox}
+\Procname{$\proc{Square}(G)$}
+\li create a graph $G^2$ consisting of $V[G]$ but no edges \label{li:square-create-G^2}
+\li \For each vertex $u \in V[G]$  \label{li:square-for-u}
+\li   \Do
+        \For each vertex $v$ adjacent to $u$ in $G$  \label{li:square-for-v}
+\li       \Do
+            \For each vertex $w$ adjacent to $v$ in $G$    \label{li:square-for-w-begin}
+\li           \Do
+                insert $(u, w)$ into $G^2$    \label{li:square-for-w-end}
+              \End
+          \End
+      \End
+\li \Return $G^2$
+\end{codebox}
+
+For adjacency list representation, \proc{Square} takes $O(V + E^2)$ running time.
+
+For adjacency matrix representation, line \ref{li:square-create-G^2} takes $\Theta(V^2)$. The \For loop in line \ref{li:square-for-u} iterates for $|V| + 1$ times. The \For loops in line \ref{li:square-for-v} and line \ref{li:square-for-w-begin} also iterate from 1 to $|V|$ both, because we have to traverse all the columns in the matrix to find out the adjacent vertices of a specific vertex. However, the body of the \For loop in line \ref{li:square-for-v} is only executed for edges, so it is executed for $|E|$ times in total during the whole running procedure. And for each edge, the \For loop in line \ref{li:square-for-w-begin} iterates from 1 to $|V|$, so the \For loop of line \ref{li:square-for-w-begin}--\ref{li:square-for-w-end} takes $\Theta(VE)$ time during the whole running procedure. Therefore, \proc{Square} takes $\Theta(V^2 + VE)$ running time for adjacency matrix representation.
+
+
+\section*{Solution to Exercise 22.1-6}
+
+This problem can be equivalently described as: given a $|V| \times |V|$ adjacency matrix $A = (a_{ij})$, determine that whether there's a integer $j$ where $1 \leq j \leq |V|$ such that $a_{ij} = 1$ for $1 \leq i \leq |V|$ except $i = j$, and $a_{jk} = 0$ for $1 \leq k \leq |V|$. The algorithm is given as follows:
+
+\begin{codebox}
+\Procname{$\proc{Has-Universal-Sink}(A)$}
+\li $i \gets j \gets 1$
+\li \While $j \leq |V|$  \label{li:Has-Universal-Sink:while-begin}
+\li   \Do
+        \If $a_{ij} = 0$
+\li       \Then
+            $j \gets j + 1$
+\li       \Else
+            \If $i = j$
+\li           \Then
+                $i \gets i + 1$
+\li             $j \gets j + 1$
+\li           \Else
+                $i \gets j$
+              \End
+          \End
+      \End    \label{li:Has-Universal-Sink:while-end}
+\li \If $i > |V|$
+\li   \Then
+        \Return \const{false}
+\li   \Else
+        \For $j \gets 1$ \To $i - 1$
+\li       \Do
+            \If $a_{ij} = 1$
+\li           \Then
+                \Return \const{false}
+              \End
+          \End
+\li     \For $j \gets 1$ \To $|V|$
+\li       \Do
+            \If $i \neq j$ and $a_{ji} = 0$
+\li           \Then
+                \Return \const{false}
+              \End
+          \End
+\li     \Return \const{true}
+      \End
+\end{codebox}
+
+To show why \proc{Has-Universal-Sink} works correctly, we use the following loop invariants:
+
+\begin{quote}
+At the start of each iteration of the \While loop of lines \ref{li:Has-Universal-Sink:while-begin}--\ref{li:Has-Universal-Sink:while-end}:
+\begin{enumerate}
+  \item $i \leq j$;
+
+  \item all the elements in $A[i, i..j-1]$ are 0;
+
+  \item in every column of the sub-matrix $A[1..i-1, 1..i-1]$, either the diagonal element being 1 or some element above the diagonal being 0.
+\end{enumerate}
+\end{quote}
+
+Here's the argument of the loop invariants:
+
+\begin{quote}
+\begin{description}
+\item[Initialization:] $i = j = 1$, all the three invariants trivially hold true.
+
+\item[Maintenance:] At the start of each iteration of the \While loop, if $a_{ij} = 0$, $i$ will maintain its value and $j$ will be increased by 1, so we still have $i \leq j$; the increment of $j$ will cause $a_{ij} = 0$ be appended to the vector $A[i, i..j-1]$, so the second variant will remain true; the sub-matrix $A[1..i-1, 1..i-1]$ will remain so the third invariant trivially holds true because of the start of the current iteration. If $a_{ij} = 1$ and $i = j$, $i$ and $j$ will both be increased by 1, so we will still have $i = j$; the second invariants will trivially remain true since $i > j - 1$; the sub-matrix $A[1..i-1, 1..i-1]$ will be expanded by one row at the bottom and one column on the right, with the bottom element (i.e. the diagonal element) in the newly added column being 1, so the third invariant will remain true. If $a_{ij} = 1$ and $i < j$, we will set $i$ to the value of $j$, then similarly the first and the second invariants will remain true; the sub-matrix $A[1..i-1, 1..i-1]$ will be expanded by $j - i$ rows at the bottom and $j - i$ columns on the right, with the elements in the $i$th row of the newly added columns being 0 because of the second invariant of the start of the current iteration, so the third invariant will remain true because those elements are all above the diagonal.
+
+\item[Termination:] When the \While loop terminates, we will have $j = |V| + 1$. If $i = j$, then according to the third loop invariant, in every column of the adjacency matrix $A$, either the diagonal element being 1 or some element above the diagonal being 0, so there's no such integer $j$ where $1 \leq j \leq |V|$ such that $a_{ij} = 1$ for $1 \leq i \leq |V|$ except $i = j$, and $a_{jk} = 0$ for $1 \leq k \leq |V|$. If $i < j$, then $1..i-1$ don't meet the requirements similarly because of the third loop invariant; $i+1..|V|$ definitely don't meet the requirements either, because of the second loop invariant. So $i$ is the only possible qualified integer. The statements after line \ref{li:Has-Universal-Sink:while-end} checks the qualification of $i$. If $a_{ki} = 1$ for $1 \leq k \leq |V|$ but $k \neq i$, and $a_{ik} = 0$ for $1 \leq k \leq |V|$, then $i$ is the qualified integer, otherwise there's no such integer.
+\end{description}
+\end{quote}
+
+During each iteration of the \While loop, we increase either $i$ or $j$, or both. The loop starts when $i = j = 1$, and terminates when $j$ reaches $|V|$, so it iterates for at most $2|V| - 1$ times. This procedure can be viewed as maintaining a cursor which traverse from the upper left corner of $A$ to the lower right corner. During each iteration we move the cursor closer to the lower-right corner. The two \For loops after line \ref{li:Has-Universal-Sink:while-end} both iterate for at most $|V| + 1$ times. Therefore, the total running time of \proc{Has-Universal-Sink} is $\Theta(V)$, which is also $O(V)$.
+
+
+\section*{Solution to Exercise 22.1-7}
+
+Suppose that $C = BB^T$, then we have $c_{ij} = \sum_{k = 1}^{|E|}b_{ik}b_{jk}$. In the case of $i = j$, we have $b_{ik}^2$ being either 0 or 1, so that $c_{ii} = \sum_{k = 1}^{|E|}b_{ik}^2 =$ the number of edges leaving or entering vertex $i$, i.e. the sum of in-degree and out-degree of vertex $i$. In the case of $i \neq j$, observe that $b_{ik}$ and $b_{jk}$ cannot be both -1 or both 1, because it is impossible for an edge to leave or enter two vertices, so $b_{ik}b_{jk}$ is either 0 or -1. The value being -1 means there's an edge leaving vertex $i$ and entering vertex $j$, or an edge leaving vertex $j$ and entering vertex $i$. Therefore, the absolute value of $c_{ij}$ is the number of such edges between vertex $i$ and vertex $j$.
+
+
+\section*{Solution to Exercise 22.2-3}
+
+The overhead of initialization is still $O(V)$. Each vertex is still enqueued at most once and dequeued at most once. However, scanning the adjacency vertices takes $O(V)$ time for each vertex now. Thus, BFS takes $O(V + V^2) = O(V^2)$ time in this situation.
+
+
+\section*{Solution to Exercise 22.3-1}
+
+Directed graph:
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+        & WHITE & GRAY & BLACK \\
+  \hline
+  WHITE & tree/back/forward/cross
+        & back/cross
+        & cross \\
+  \hline
+  GRAY  & tree/forward
+        & tree/back/forward
+        & tree/forward/cross \\
+  \hline
+  BLACK & impossible
+        & back
+        & tree/back/forward/cross \\
+  \hline
+\end{tabular}
+\end{center}
+
+\bigskip
+\noindent
+Undirected graph:
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+  \hline
+  % after \\: \hline or \cline{col1-col2} \cline{col3-col4} ...
+        & WHITE & GRAY & BLACK \\
+  \hline
+  WHITE & tree/back & tree/back & impossible \\
+  \hline
+  GRAY  & tree/back & tree/back & tree/back \\
+  \hline
+  BLACK & impossible & tree/back & tree/back \\
+  \hline
+\end{tabular}
+\end{center}
+
+
+\section*{Solution to Exercise 22.3-4}
+
+These arguments can be proved with theorem 22.7 (parenthesis theorem). Notice that the case $d[u] < f[u] < d[v] < f[v]$ is impossible to occur.
+
+
+\section*{Solution to Exercise 22.3-5}
+
+See the proof of theorem 22.10.
+
+
+\section*{Solution to Exercise 22.3-6}
+
+In order to implement a non-recursive \proc{DFS}, we need to maintain in each vertex $u$ an additional field $\id{next-adj}[u]$, which points to the first vertex in $\id{Adj}[u]$ or \const{nil} if $\id{Adj}[u] = \emptyset$ when initialized.
+
+\begin{codebox}
+\Procname{$\proc{DFS}(G)$}
+\li \For each vertex $u \in V[G]$
+\li   \Do
+        $\id{color}[u] \gets \const{white}$
+\li     $\pi[u] \gets \const{nil}$
+\li     $\id{next-adj}[u] \gets \mbox{the first vertex in} \id{Adj}[u]$
+      \End
+\li $\id{time} \gets 0$
+\li create an empty stack $S$
+\li \For each vertex $u \in V[G]$
+\li   \Do
+        \If $\id{color}[u] = \const{white}$
+\li       \Then
+            $\id{color}[u] \gets \const{gray}$
+\li         $d[u] \gets \id{time} \gets \id{time} + 1$
+\li         $\proc{Push}(S, u)$
+\li         \Repeat
+                $v \gets \proc{Pop}(S)$
+\li             \If $\id{next-adj}[v] = \const{nil}$
+\li               \Then
+                    $\id{color}[v] \gets \const{black}$
+\li                 $f[v] \gets \id{time} \gets \id{time} + 1$
+\li               \Else
+                    $\proc{Push}(S, v)$
+\li                 \If $\id{color}[ \id{next-adj}[v] ] = \const{white}$
+\li                   \Then
+                         $\pi[ \id{next-adj}[v] ] \gets v$
+\li                      $\id{color}[ \id{next-adj}[v] ] \gets \const{gray}$
+\li                      $d[ \id{next-adj}[v] ] \gets \id{time} \gets \id{time} + 1$
+\li                      $\proc{Push}(S, \id{next-adj}[v])$
+                      \End
+\li                 $\id{next-adj}[v] \gets \mbox{next vertex in} \id{Adj}[v]$
+                  \End
+\li         \Until $\proc{Stack-Empty}(S)$
+          \End
+      \End
+\end{codebox}
+
+
+\section*{Solution to Exercise 22.3-9}
+
+To print out every edge together with its type in the directed graph $G$, modify the \kw{for} loop of lines 4-7 of \proc{DFS-Visit} as follows:
+
+\begin{codebox}
+\setlinenumberplus{}{4}
+\li \For each $v \in \id{Adj}[u]$
+\li   \Do
+        \If $\id{color}[v] = \const{white}$
+\li       \Then
+            $\pi[v] \gets u$
+\li         print $(u, v)$, ``tree edge''
+\li         $\proc{DFS-Visit}(v)$
+\li     \ElseIf $\id{color}[v] = \const{gray}$
+\li       \Then
+            print $(u, v)$, ``back edge''
+\li     \ElseIf $d[u] < d[v]$
+\li       \Then
+            print $(u, v)$, ``forward edge''
+\li     \ElseNoIf
+            print $(u, v)$, ``cross edge''
+        \End
+      \End
+\end{codebox}
+
+If $G$ is undirected, the modification is as follows:
+
+\begin{codebox}
+\setlinenumberplus{}{4}
+\li \For each $v \in \id{Adj}[u]$
+\li   \Do
+        \If $\id{color}[v] = \const{white}$
+\li       \Then
+            $\pi[v] \gets u$
+\li         print $(u, v)$, ``tree edge''
+\li         $\proc{DFS-Visit}(v)$
+\li       \Else
+            print $(u, v)$, ``back edge''
+          \End
+      \End
+\end{codebox}
+
+
+\section*{Solution to Exercise 22.4-2}
+
+The idea is to perform \proc{DFS-Visit} on $s$. We maintain in each vertex a boolean member $b$ which indicates whether there's a path from this vertex to $t$, and which is initialized as \const{false}.
+
+\begin{codebox}
+\Procname{$\proc{Count-Number-Of-Paths}(G, s, t)$}
+\li \For each vertex $u \in V[G]$
+\li   \Do
+        $\id{color}[u] \gets \const{white}$
+\li     $b[u] \gets \const{false}$
+      \End
+\li $n \gets 0$
+\li \proc{DFS-Visit'}$(s)$
+\li \Return $n$
+\end{codebox}
+
+\begin{codebox}
+\Procname{$\proc{DFS-Visit'}(u)$}
+\li $\id{color}[u] \gets \const{gray}$
+\li \If $u = t$
+\li   \Then
+        $b[u] \gets \const{true}$
+\li     $n \gets n + 1$
+\li   \Else
+        \For each $v \in \id{Adj}[u]$
+\li       \Do
+            \If $\id{color}[v] = \const{white}$
+\li           \Then
+                $\proc{DFS-Visit'}(v)$
+\li             \If $b[v] = \const{true}$
+\li               \Then
+                    $b[u] \gets \const{true}$
+                  \End
+\li         \ElseIf $b[v] = \const{true}$
+\li           \Then
+                $b[u] \gets \const{true}$
+\li             $n \gets n + 1$
+              \End
+          \End
+      \End
+\li $\id{color}[u] \gets \const{black}$
+\end{codebox}
+
+The running time of \proc{Count-Number-Of-Paths} is $O(V + E)$.
+
+
+\section*{Solution to Exercise 22.4-4}
+
+Using \proc{Topological-Sort}, only back edges in $G$ are ``bad'' (from lemma 22.11). Suppose that there is an algorithm that can get fewer ``bad'' edges than \proc{Topological-Sort} does, then there must be at least one cycle in which all the edges are ``good'' in the better result. If we consider all the cycles which contain just one back edge each (i.e. all other edges in the cycle are tree edges), there must be at least one such cycle whose edges are all ``good'' in the better result. Let's say $(v, u)$ is a back edge in such a cycle, then $v$ must appear before $u$ in the better ordering. Suppose the path from $u$ to $v$ is $(u, s_1), (s_1, s_2), \ldots, (s_{n-1}, s_n), (s_n, v)$, where $n \geq 1$. If all these edges are ``good'', we would have $u$ appearing before $s_1$, $s_1$ appearing before $s_2$, and so on, then at last $s_n$ appearing before $v$, so that $u$ appears before $v$, which is a contradiction. Therefore, such better algorithm does not exist, \proc{Topological-Sort} produces the minimum number of ``bad'' edges.
+
+
+\section*{Solution to Exercise 22.4-5}
+
+We can use a modified version of \proc{BFS}:
+
+\begin{codebox}
+\Procname{$\proc{Topological-Sort'}(G)$}
+\li $Q \gets \emptyset$
+\li \For each vertex $u \in V[G]$
+\li   \Do
+        \If $\id{in-degree}[u] = 0$
+\li       \Then
+            $\proc{Enqueue}(Q, u)$
+          \End
+      \End
+\li \While $Q \neq \emptyset$
+\li   \Do
+        $u \gets \proc{Dequeue}(Q)$
+\li     insert $u$ into the end of a linked list
+\li     \For each $v \in \id{Adj}[u]$
+\li       \Do
+            remove $(u, v)$ from $G$
+\li         \If $\id{in-degree}[v] = 0$
+\li           \Then
+                $\proc{Enqueue}(Q, v)$
+              \End
+          \End
+      \End
+\li \Return the linked list of vertices
+\end{codebox}
+
+If $G$ has cycles, the vertices in the cycles won't be returned in the linked list, i.e. they won't appear in the ordering.
+
+
+\section*{Solution to Exercise 22.5-1}
+
+Adding a reverse of an edge in the component graph $G^{\mbox{SCC}}$ can decrease the number of strongly connected components of $G$ by 1.
+
+
+\section*{Solution to Problem 22-2}
+
+Because $G$ is a connected undirected graph, we have $|V| \leq |E| + 1$. Therefore, $O(V + E) = O(E)$.
+
+\begin{enumerate}[label=\itshape \bfseries \alph{enumi}]
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+
+\item  % a
+
+This is trivial.
+
+\item  % b
+
+This is trivial.
+
+\item  % c
+
+The idea is to use a modified version of \proc{DFS-Visit}. Notice that we won't know the final value of $\id{low}[v]$ until the whole subtree of $v$ has been visited.
+
+\begin{codebox}
+\Procname{$\proc{Compute-Low}(u)$}
+\li $\id{color}[u] \gets \const{gray}$
+\li $\id{time} \gets \id{time} + 1$ \>\>\>\>\> \Comment \id{time} is set to 0 before the whole recursive procedure
+\li $d[u] \gets \id{time}$
+\li $\id{low}[u] \gets d[u]$
+\li \For each $v \in \id{Adj}[u]$
+\li   \Do
+        \If $\id{color}[v] = \const{white}$
+\li       \Then
+            $\pi[v] \gets u$
+\li         $\proc{Compute-Low}(v)$
+\li         \If $\id{low}[v] < \id{low}[u]$
+\li           \Then
+                $\id{low}[u] \gets \id{low}[v]$
+              \End
+\li       \ElseIf $\pi[u] \neq \const{nil}$ and $d[v] < \id{low}[\pi[u]]$
+\li         \Then
+              $\id{low}[\pi[u]] \gets d[v]$
+            \End
+          \End
+      \End
+\li $\id{color} \gets \const{black}$
+\li $f[u] \gets \id{time} \gets \id{time} + 1$
+\end{codebox}
+
+\item  % d
+
+Find $v$ where $\id{low}[v] = d[v]$.
+
+\item\label{problem_22_2:e}  % e
+
+An edge $(u, v)$ of $G$ is a bridge \textbf{only if} it does not lie on any simple cycle of $G$: If there's a simple cycle $<u, v, \ldots, u>$ (denoted by $u \to v \stackrel{P}{\leadsto} u$ in $G$ and you remove $(u, v)$, any path $u' \stackrel{P'}{\leadsto} v'$ that contains $(u, v)$ before the removal can replace $(u, v)$ with $u \stackrel{P^{r}}{\leadsto} v$ where $P^{r}$ is the reverse of path $P$, so that the connection is not affected.
+
+An edge $(u, v)$ of $G$ is a bridge \textbf{if} it does not lie on any simple cycle of $G$: If $(u, v)$ does not lie on any simple cycle, its removal will break any path that contains $(u, v)$ (because if there's another substitution path $u \stackrel{P}{\leadsto} v$, $(u, v)$ is on a simple cycle, which leads to a contradiction), so that the connection is broken.
+
+\item  % f
+
+If $\id{low}[v] < d[v]$ and there's no back edge from $v$, $(\pi[v], v)$ is in a simple cycle and is not a bridge; otherwise $(\pi[v], v)$ is a bridge.
+
+\item  % g
+
+The definition of `partition' here meas a nonbridge edge must lie on exactly one biconnected component of $G$. From \ref{problem_22_2:e} and the definition of biconnected components (\id{bcc}), a nonbridge edge must lie on at least one \id{bcc}. Now suppose that we have three nonbridge edges $e_1 = (u_1, v_1)$, $e_2 = (u_2, v_2)$ and $e_3 = (u_3, v_3)$. Also suppose that $e_1$ and $e_2$ lie on the same \id{bcc}, $e_1$ and $e_3$ lie on the same \id{bcc}, but $e_2$ and $e_3$ lie on different \id{bcc}s, so that $e_1$ lies in two \id{bcc}s. From the definition of \id{bcc}, we can suppose that there're two simple cycles $u_1 \to v_1 \stackrel{P}\leadsto u_2 \to v_2 \stackrel{Q}\leadsto u_1$ and $u_1 \to v_1 \stackrel{R}\leadsto u_3 \to v_3 \stackrel{S}\leadsto u_1$, but then we have $u_2 \to v_2 \stackrel{Q}\leadsto u_1 \stackrel{S}\leadsto v_3 \to u_3 \stackrel{R}\leadsto v_1 \stackrel{P}\leadsto u_2$, so that $e_2 = (u_2, v_2)$ and $e_3 = (u_3, v_3)$ are also in the same \id{bcc}, and $e_1$ lies on just one \id{bcc}.
+
+\item  % h
+
+Remove all the bridges, and then run \proc{DFS}.
+
+\end{enumerate}
+
+
+\section*{Solution to Problem 22-3}
+
+\begin{enumerate}[label=\itshape \bfseries \alph{enumi}]
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+
+\item  % a
+
+See instructor's manual, but there's an error in the nonconstructive proof: $x \in V'' \cup V_C$ should be changed to $x \in V'' \cap V_C$.
+
+\end{enumerate}
+
+\end{document}

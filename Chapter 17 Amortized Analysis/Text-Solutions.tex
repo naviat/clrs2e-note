@@ -1,0 +1,81 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{clrscode}
+\setlength\mathindent{0em}
+\parskip = 7bp
+\begin{document}
+
+\section*{Solution to Exercise 17.3-6}
+
+We will implement a queue $Q$ with two ordinary stacks $\id{S}[Q]$ and
+$\id{T}[Q]$, so that the operations of \proc{Enqueue} and
+\proc{Dequeue} are implemented as below:
+
+\begin{codebox}
+\Procname{\proc{Enqueue}$(Q, x)$}
+\li \proc{Push}$(\id{S}[Q])$
+\end{codebox}
+
+\begin{codebox}
+\Procname{\proc{Dequeue}$(Q)$}
+\li \If \proc{Stack-Empty}$(\id{T}[Q])$
+\li   \Then
+        \If \proc{Stack-Empty}$(\id{S}[Q])$
+\li       \Then
+            \Error ``underflow''
+\li       \Else
+            \Repeat
+\li           $x \gets \proc{Pop}(\id{S}[Q])$
+\li           \proc{Push}$(\id{T}[Q])$
+\li         \Until \proc{Stack-Empty}$(\id{S}[Q])$
+          \End
+      \End
+\li \Return \proc{Pop}$(\id{T}[Q])$
+\end{codebox}
+
+We will also define $\Phi(D_i)$ to be the number of objects in
+$\id{S}[Q]$ after the $i$th operation, and $\Phi(D_0) = 0$. The
+argument of the amortized costs is omitted.
+
+
+
+
+
+
+\section*{Solution to Problem 17-3}
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+\stepcounter{enumi}
+\stepcounter{enumi}
+\stepcounter{enumi}
+
+\item  % d
+
+$m$ units of potential can pay for rebuilding an $m$-node subtree.
+That means it costs $m$ units of actual time to rebuild an $m$-node
+subtree. Since a 1/2-balanced tree has potential 0, the amortized time
+to rebuild an $m$-node tree is $m + 0 - \Phi(T') = m - \Phi(T')$
+where $T'$ is the tree to rebuild. The upper bound of this amortized
+time can be determined by calculating the lower bound of $\Phi(T')$.
+
+As we know, a subtree is rebuilt only when an insertion or deletion
+breaks the balance. Therefore, we have
+
+\begin{eqnarray*}
+\Phi(T')
+& \geq & c \Delta(\id{root}[T']) \\
+& = & c (\alpha m - (1-\alpha) m) \\
+& = & (2\alpha - 1)cm.
+\end{eqnarray*}
+
+If we want the amortized time to be $O(1)$, then we must have $m -
+\Phi(T') \leq \beta$, i.e. $\Phi(T') \geq m - \beta$, where $\beta$ is
+some constant. This inequality can be guaranteed by letting $(2\alpha
+- 1)cm \geq m - \beta$, i.e., $c \geq 1/(2\alpha
+- 1) - \beta/((2\alpha - 1)m)$.
+
+Therefore, it takes $O(1)$ amortized time to rebuild a subtree that is
+not $\alpha$-balanced as long as $c \geq 1/(2\alpha - 1)$.
+\end{enumerate}
+
+\end{document}

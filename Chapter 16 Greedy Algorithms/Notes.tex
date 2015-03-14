@@ -1,0 +1,20 @@
+\documentclass{article}
+\begin{document}
+
+\section*{Nov 12, 2009}
+
+In Section 16.4, a matroid is defined as an ordered pair $M = (S,l)$.
+The \LaTeX code to print the symbol of $l$ in the text book is
+\texttt{\char92}mathcal\{l\}, with package \textsf{mathtime} included
+in the preamble.  This information is got from the email from Thomas
+H. Cormen (the first author of the text book).  
+
+\section*{Nov 14, 2009}
+
+I find a bug in Section 16.4, which is located at line 11 from the
+bottom on page 400. The statement ``(2) implies that the $i$th largest
+deadline is at least $i$'' should be changed to ``(2) implies that the
+$i$th smallest (earliest) deadline in $A$ is at least $i$, otherwise
+we will have $N_{i-1}(A) > i-1$ which is contradictory.''
+
+\end{document}

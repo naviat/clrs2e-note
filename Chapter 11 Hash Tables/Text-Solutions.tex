@@ -1,0 +1,85 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{clrscode}
+\setlength\mathindent{0em}
+\parskip = 7bp
+\begin{document}
+
+\section*{Solution to Exercise 11.2-3}
+\begin{itemize}
+\item
+\textbf{\textit{Successful searches:}} As in the text, we assume that
+the element being searched for is equally likely to be any of the $n$
+elements stored in the table. The number of elements examined during a
+successful search for an element $x$ is 1 more than the number of
+elements that appear before $x$ in $x$'s list. However, in a sorted
+list, elements before $x$ in the list are all smaller than $x$
+(assuming that all keys are distinct), and elements after $x$ in the
+list are all greater than $x$. Let $x'_i$ denote the $i$th smallest
+element inserted into the table, for $i = 1, 2, \ldots, n,$ and let
+$k'_i = \id{key}[x'_i]$. For keys $k'_i$ and $k'_j$, we define the
+indicator random variable $X'_{ij} = \mbox{I}\{h(k'_i) =
+h(k'_j)\}$. Under the assumption of simple uniform hashing, we have
+Pr\{$h(k'_i) = h(k'_j)$\} = $1/m$, and so by Lemma 5.1, E[$X'_{ij}$] =
+$1/m$. Thus, the expected number of elements examined in a successful
+search is
+\[
+\mbox{E}\left[
+\frac{1}{n}\sum_{i=1}^n \left(1 + \sum_{j=1}^{i-1}X'_{ij} \right)
+\right],
+\]
+which is $\Theta(1+\alpha)$, the same as the hash table of unsorted
+list version.
+
+\item
+\textbf{\textit{Unsuccessful searches:}} 
+
+\item
+\textbf{\textit{Insertions:}} The same as unsuccessful searches.
+
+\item
+\textbf{\textit{Deletions:}} The worst-case time is still $O(1)$ when
+the lists are doubly linked.
+\end{itemize}
+
+
+
+
+
+\section*{Solution to Exercise 11.3-6}
+
+Let $f(x;a_0, a_1, \ldots, a_{n-1}) = \sum_{j=0}^{n-1}a_jx^j$, then
+\[
+h_b(\langle a_0, a_1, \ldots, a_{n-1} \rangle) = f(b;a_0, a_1,
+\ldots, a_{n-1}) \mbox{ mod } p.
+\]
+Suppose that $\alpha$ is an element in $U$ and $f(b;\alpha) \equiv c$
+(mod $p$) where $c \in Z_p$, then $b$ is a zero of $f(x;\alpha) - c$
+according to the definition in Exercise 31.4-4. Also from the
+conclusion of that exercise, $f(x;\alpha) - c$ can have at most $n-1$
+distinct zeros modulo $p$. Thus, there are at most $n-1$ such $b$ to
+make $f(b;\alpha) \equiv c$ (mod $p$), or $h_b(\alpha) =
+c$. Therefore, for any element in $U$, the number of hash functions $h
+\in \mathcal{H}$ to hash this element to a specific slot is $n-1$. In
+other words, with a hash function randomly chosen from $\mathcal{H}$,
+the chance of a collision between two distinct elements is no more
+than $(n-1) / |\mathcal{H}| = (n-1)/p$. Therefore, $\mathcal{H}$ is
+$((n-1)/p)$-universal.
+
+
+
+
+
+
+\section*{Solution to Problem 11-4}
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+\item  % a
+If the family $\mathcal{H}$ of hash functions is 2-universal, then for
+each pair of distinct keys $k,l \in U$ and for any $h$ chosen at
+random from $\mathcal{H}$, the pair $\langle h(k), h(l) \rangle$ is
+equally likely to be any of the $m^2$ pairs with elements drawn from
+${0, 1, \ldots, m-1}$. Therefore, the chance of $h(k) = h(l)$ is
+$m/m^2 = 1/m$. Thus, $\mathcal{H}$ is universal.
+\end{enumerate}
+
+\end{document}

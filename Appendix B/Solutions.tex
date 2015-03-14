@@ -1,0 +1,17 @@
+\documentclass[a4paper, fleqn]{article}
+\setlength\mathindent{0em}
+\parskip=7bp
+\begin{document}
+
+\section*{Solution to \textbf{\textit{B.5-3}}}
+Let $n$, $n_0$, $n_2$ be the total number of nodes, the number of leaves, and the number of degree-2 nodes 
+in any binary tree, respectively. If $n = 1$, then there's only the root in the binary tree, and we have 
+$n_0 = 1$, $n_2 = 0$. Therefore, $n_2 = n_0 - 1$.
+
+Suppose that $n_2 = n_0 - 1$ holds for any binary tree of size $n$ where $n \geq 1$. Let's add a new node 
+to the tree making the size be $n' = n + 1$. If the new node is appended to a leaf in the original tree, 
+then the number of degree-2 nodes is $n'_2 = n_2$, the number of leaves is $n'_0 = n_0$ and of course we 
+have $n'_2 = n'_0 - 1$ since $n_2 = n_0 - 1$. Otherwise if the new node is appended to a degree-1 nodes in 
+the original tree, then we have $n'_2 = n_2 + 1$, $n'_0 = n_0 + 1$ and still we have $n'_2 = n'_0 - 1$.
+
+\end{document}

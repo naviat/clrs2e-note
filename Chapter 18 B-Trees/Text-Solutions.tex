@@ -1,0 +1,134 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{clrscode}
+\setlength\mathindent{0em}
+\parskip = 7bp
+\begin{document}
+
+\section*{Solution to Exercise 18.2-2}
+
+A redundant \proc{Disk-Read} happens when the root is split, and the
+insertion goes down at least one level in the tree with a new root. In
+this case, the two children of the new root are in memory prior to the
+\proc{Disk-Read} operation in line 12 of \proc{B-Tree-Insert-Nonfull},
+bacause they are parts of the former root.
+
+There's no redundant \proc{Disk-Write}.
+
+
+
+
+
+
+\section*{Solution to Exercise 18.2-3}
+
+To find the minimum key stored in a B-tree, we can follow the leftmost
+path downward from the root until we reach the leftmost leaf. The
+leftmost key in the leftmost leaf is the minimum key of the tree.
+
+To find the maximum key stored in a B-tree, we can follow the
+rightmost path downward from the root until we reach the rightmost
+leaf. The rightmost key in the rightmost leaf is the maximum key of
+the tree.
+
+The procedure below find the predecessor of a given key
+$\id{key}_i[x]$:
+
+\begin{codebox}
+\Procname{\proc{B-Tree-Find-Predecessor}$\id{key}_i[x]$}
+\If $\id{leaf}[x]$
+  \Then
+    \If $i > 1$
+      \Then
+        \Return $\id{key}_{i-1}[x]$
+      \Else
+        \While $x$ is not the root and $x$ is the leftmost child of its parent
+          \Do
+            $x \gets \mbox{ the parent of } x$
+          \End
+        \If $x$ is the root
+          \Then
+            \Return \const{nil}
+          \Else
+            $y \gets \mbox{ the parent of } x$
+            $i \gets \mbox{ the index of child of } x { in } y$
+            \Return $\id{key}_{i-1}[y]$
+          \End
+      \End
+  \Else
+    \Return the maximum key in the subtree rooted at $c_i[x]$
+  \End
+\end{codebox}
+
+
+
+
+
+
+\section*{Solution to Problem 18-1}
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+
+\stepcounter{enumi}  % a
+\stepcounter{enumi}  % b
+\stepcounter{enumi}  % c
+
+\item  % d
+
+Let's denote the stack as an array $S$, where $S[0]$ is the stack
+bottom. We only consider the cases where we are going to push in or
+pop from a page which is not in memory.
+
+If we want to push a new element into $S[i]$, where $i \geq 1$, then
+we can load the page, where $S[i]$ resides, into the memory position,
+where the page containing $S[i-1]$ does \emph{not} resides, and
+overwrite the page containing $S[i-1]$. If $i = 0$, then we can load
+the page into either memory position.
+
+If we want to pop the current stack head $S[i]$, then we can load the
+page, where $S[i]$ resides, into the memory position, where the page
+containing $S[i+1]$ resides, and overwrite the page containing
+$S[i+1]$.
+
+\end{enumerate}
+
+
+
+
+
+
+\section*{Solution to Problem 18-2}
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+
+\stepcounter{enumi}  % a
+
+\item  % b
+
+Suppose that $k$ is greater than the keys in $T'$, and is less than
+the keys in $T''$.
+
+If $h' = h''$, then let $k$ be the root, $T'$ be the left subtree and
+$T''$ be the right subtree.
+
+If $h' < h''$, the locate in the leftmost path of $T''$ the node $x$
+of height $h'+1$. Insert $k$ as the leftmost key in $x$ and $T'$ as
+the leftmost child of $x$. If $x$ contains four keys after the
+insertion, then split $x$ as is done in \proc{B-Tree-Split-Child}. The
+splitting operation will go upward to the root.
+
+The situation of $h' > h''$ is symmetric to that of $h' < h''$.
+
+\item  % c
+
+The heights of $T'_{i-1}$ are always less than those of $T'_i$.
+
+\item  % d
+
+Take advantage the conclusion of \textbf{\emph{c}}. The total
+asymptotic running time is $O(d_k)$, where $d_k$ is the depth of $k$.
+
+\end{enumerate}
+
+\end{document}

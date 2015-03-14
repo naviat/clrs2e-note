@@ -1,0 +1,353 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{clrscode}
+\setlength\mathindent{0em}
+\parskip = 7bp
+\begin{document}
+
+\section*{Solution to Exercise 6.1-7}
+
+Since $2\lfloor n/2 \rfloor \leq n$, $A[\lfloor n/2 \rfloor]$ has at least one 
+child. Since $2(\lfloor n/2 \rfloor + 1) > n$, $A[\lfloor n/2 \rfloor + 1]$ has 
+no child, so does $A[\lfloor n/2 \rfloor + 2]$, $A[\lfloor n/2 \rfloor + 3]$, 
+\ldots, and $A[n]$. Thus, the leaves are the nodes indexed by $\lfloor n/2 
+\rfloor + 1$, $\lfloor n/2 \rfloor + 2$, \ldots, $n$.
+
+
+
+
+
+
+
+\section*{Solution to Exercise 6.2-2}
+
+Here's the procedure \proc{Min-Heapify}$(A,i)$:
+\begin{codebox}
+\Procname{$\proc{Min-Heapify}(A,i)$}
+\li $l \gets \proc{Left}(i)$
+\li $r \gets \proc{Right}(i)$
+\li \If $l \leq \id{heap-size}[A]$ and $A[l] < A[i]$
+\li     \Then $\id{smallest} \gets l$
+\li     \Else $\id{smallest} \gets i$
+        \End
+\li \If $r \leq \id{heap-size}[A]$ and $A[r] < A[\id{smallest}]$
+\li     \Then $\id{smallest} \gets r$
+        \End
+\li \If $\id{smallest} \neq i$
+\li     \Then
+            exchange $A[i] \leftrightarrow A[\id{smallest}]$
+            \proc{Min-Heapify}$(A,\id{smallest})$
+        \End
+\end{codebox}
+Its running time is asymptotically the same as that of \proc{Max-Heapify}.
+
+
+
+
+
+
+
+\section*{Solution to Exercise 6.2-5}
+
+\begin{codebox}
+\Procname{$\proc{Max-Heapify}(A,i)$}
+\li $j \gets i$
+\li $\id{key} \gets A[i]$
+\li \Repeat
+        $\id{stop} \gets \const{true}$
+\li     $l \gets \proc{Left}(j)$
+\li     $r \gets \proc{Right}(j)$
+\li     \If $l \leq \id{heap-size}[A]$ and $A[l] > key$
+\li         \Then
+                $\id{largest} \gets A[l]$
+\li             $\id{largest-id} \gets l$
+\li         \Else
+                $\id{largest} \gets key$
+\li             $\id{largest-id} \gets j$
+            \End
+\li     \If $r \leq \id{heap-size}[A]$ and $A[r] > largest$
+\li         \Then
+                $\id{largest} \gets A[r]$
+\li             $\id{largest-id} \gets r$
+            \End
+\li     \If $\id{largest-id } \neq j$
+\li         \Then
+                $A[j] \gets \id{largest}$
+\li             $j \gets \id{largest-id}$
+\li             $\id{stop} \gets \const{false}$
+            \End
+\li \Until \id{stop}
+\li $A[j] \gets \id{key}$
+\end{codebox}
+
+
+
+
+
+
+
+\section*{Solution to Exercise 6.3-3}
+
+A node indexed by $i$ is of height $h$ if and only if $2^{h}i \leq n <
+2^{h+1}i$, or $n/2^{h+1} < i \leq n/2^h$, or $\lfloor n/2^{h+1}
+\rfloor < i \leq \lfloor n/2^h \rfloor$ since $i$ is an integer. Thus,
+the number of nodes of height $h$ in any $n$-element heap is $\lfloor
+n/2^h \rfloor - \lfloor n/2^{h+1} \rfloor \leq \lceil n/2^{h+1}
+\rceil$.
+
+
+
+
+
+
+
+\section*{Solution to Exercise 6.4-4}
+
+The worst-case occurs when each iteration of the \kw{for} loop invokes the 
+\proc{Max-Heapify} procedure as a worst-case. Since the worst-case running time 
+of \proc{Max-Heapify} on a heap of $n$ is $\Omega(\lg n)$ (see Exercise 6.2-6), 
+the worst-case running time of heapsort is $\sum_{i = 1}^{n - 1} \Omega(\lg i) 
+= \Omega(\sum_{i = 1}^{n - 1} \lg i) = \Omega(\lg (n - 1)!) = \Omega(\lg n! - 1) 
+= \Omega(n\lg n)$.
+
+
+
+
+
+
+
+\section*{Solution to Exercise 6.5-4}
+
+Because of line 1--2 in \proc{Heap-Increase-Key}.
+
+
+
+
+
+
+
+\section*{Solution to Exercise 6.5-7}
+
+\begin{codebox}
+\Procname{$\proc{Heap-Delete}(A,i)$}
+\li \While $i > 1$
+\li     \Do
+            $A[i] \gets A[\proc{Parent}(i)]$
+\li         $i \gets \proc{Parent}(i)$
+        \End
+\li $A[1] \gets A[\id{heap-size}[A]]$
+\li $\id{heap-size}[A] \gets \id{heap-size}[A] - 1$
+\li \proc{Max-Heapify}$(A,1)$
+\end{codebox}
+
+
+
+
+
+
+
+\section*{Solution to Exercise 6.5-8}
+
+Let $A[i]$ denote the $i$th sorted list, so that $A[i][j]$ is the $j$th element 
+of the $i$th sorted list. The $O(n\lg n)$-time merging algorithm maintains a 
+min-heap $D$ of size $k$ storing the smallest unmerged elements of the $k$ 
+sorted lists. Note that each element in $D$ contains both a key and a value, 
+of which the key is an element from the $k$ sorted lists, of which the min-heap 
+is built upon, and the value points out that which sorted list the key is from. 
+$C[i]$ indexes the smallest unmerged elements in the $i$th sorted list.
+\begin{codebox}
+\Procname{$\proc{Merge}(A,k,n)$}
+\li create arrays $B[1 \twodots n]$, $C[1 \twodots k]$ and $D[1 \twodots k]$
+\li \For $i \gets 1$ \To $k$                \label{li:merge-k-init-for-begin}
+\li     \Do
+            $C[i] \gets 1$
+\li         $\id{key}[D[i]] \gets A[i][1]$
+\li         $\id{value}[D[i]] \gets i$
+\li         $\id{length}[A[i]] \gets \id{length}[A[i]] + 1$
+\li         $A[\id{length}[A]] \gets \infty$
+        \End                                \label{li:merge-k-init-for-end}
+\li \proc{Build-Min-Heap}$(D)$              \label{li:merge-k-build-min-heap}
+\li \For $i \gets 1$ \To $n$                \label{li:merge-k-main-for-begin}
+\li     \Do
+            $\id{min-elem} \gets \proc{Heap-Extract-Min}(D)$
+\li         $B[i] \gets \id{key}[\id{min-elem}]$
+\li         $j \gets \id{value}[\id{min-elem}]$
+\li         $C[j] \gets C[j] + 1$
+\li         \proc{Min-Heap-Insert}$(D, A[j][C[j]])$
+        \End                                \label{li:merge-k-main-for-end}
+\li \Return $B$
+\end{codebox}
+The \kw{for} loop of lines \ref{li:merge-k-init-for-begin}--\ref{li:merge-k-init-for-end} 
+and invoking \proc{Build-Min-Heap} in line \ref{li:merge-k-build-min-heap} 
+both take time $\Theta(k)$. The \kw{for} loop of lines \ref{li:merge-k-main-for-begin}--\ref{li:merge-k-main-for-end} 
+takes time $O(n\lg k)$ since the calls to \proc{Heap-Extract-Min} and 
+\proc{Min-Heap-Insert} in each of the $n$ iterations both take time $O(\lg k)$. 
+Notice that we always have $k \leq n$. Therefore, the whole algorithm takes time 
+$O(n\lg k)$.
+
+
+
+
+
+
+
+\section*{Solution to Problem 6-2}
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+\stepcounter{enumi}
+\item  % b
+Suppose that a $d$-ary heap of $n$ elements has height $h$, then $n$ is at least 
+$1 + d + \cdots + d^{h-1} + 1 = (d^h - 1)/(d - 1) + 1$; and $n$ is at most $1 + 
+d + \cdots + d^h = (d^{h+1} - 1)/(d - 1)$. Therefore, we have
+\begin{eqnarray*}
+& & \frac{d^h - 1}{d - 1} + 1 \leq n \leq \frac{d^{h+1} - 1}{d - 1} \\
+& \Rightarrow & \frac{d^h - 1}{d - 1} \leq n \leq \frac{d^{h+1} - 1}{d - 1} \\
+& \Rightarrow & \frac{d^h}{d} \leq n \leq \frac{d^{h+1}-(d-1)}{d-(d-1)} \\
+& \Rightarrow & d^{h-1} \leq n \leq d^{h+1}-d+1 < d^{h+1} \\
+& \Rightarrow & \log_d n - 1 < h \leq \log_d n + 1 \\
+& \Rightarrow & h = \Theta(\log_d n).
+\end{eqnarray*}
+\end{enumerate}
+
+
+
+
+
+
+
+\section*{Solution to Problem 6-3}
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+
+\item  % a
+Here's a possible $4 \times 4$ Young tableau containing those elements:
+\[
+\begin{array}{cccc}
+2 & 3 & 5 & 12 \\
+4 & 8 & 14 & \infty \\
+9 & 16 & \infty & \infty \\
+\infty & \infty & \infty & \infty
+\end{array}
+\]
+
+
+
+\item  % b
+If $Y[1,1] = \infty$, then $Y[1,2]$ and $Y[2,1]$ should also be $\infty$, since 
+the orders of $Y[1,1]$, $Y[1,2]$ and $Y[1,1]$, $Y[2,1]$ should be sorted. Continuing 
+this inference results that all elements in $Y$ are $\infty$. The second arguement 
+can be infered similarly.
+
+\item  % c
+Here's the \proc{Extract-Min} algorithm, which relies on a subroutine called 
+\proc{Youngify}:
+\begin{codebox}
+\Procname{\proc{Extract-Min}$(Y,m,n)$}
+\li $\id{min} \gets Y[1,1]$
+\li \proc{Youngify}$(Y,1,1,m,n)$
+\li \Return \id{min}
+\end{codebox}
+\proc{Youngify}$(Y,i,j,m,n)$ is a recursive subroutine, which assumes that \\ 
+$Y[i \twodots m, j+1 \twodots n]$ and $Y[i+1 \twodots m, j \twodots n]$ are 
+Young tableaus, but $Y[i,j]$ is missing, i.e., $Y[i,j] = \infty$. It adjusts 
+$Y[i \twodots m, j \twodots n]$ into a Young tablea by changing the positions 
+of elements in $Y$.
+\begin{codebox}
+\Procname{\proc{Youngify}$(Y,i,j,m,n)$}
+\li \If $i = m$
+\li     \Then
+            \For $k \gets j$ \To $n-1$
+\li             \Do
+                    $Y[m,k] \gets Y[m,k+1]$
+                \End
+\li         $Y[m,n] \gets \infty$
+\li         \Return
+        \End
+\li \If $j = n$
+\li     \Then
+            \For $k \gets i$ \To $m-1$
+\li             \Do
+                    $Y[k,n] \gets Y[k+1,n]$
+                \End
+\li         $Y[m,n] \gets \infty$
+\li         \Return
+        \End
+\li \If $Y[i+1,j] < Y[i,j+1]$
+\li     \Then
+           \Comment Solve the $(m-i) \times (n-j+1)$ subproblem.
+\li         $Y[i,j] \gets Y[i+1,j]$
+\li         \proc{Youngify}$(Y,i+1,j,m,n)$ 
+\li     \Else
+            \Comment Solve the $(m-i+1) \times (n-j)$ subproblem.
+\li         $Y[i,j] \gets Y[i,j+1]$
+\li         \proc{Youngify}$(Y,i,j+1,m,n)$
+        \End
+\end{codebox}
+
+
+
+\item  % d
+Here's the algorithm for inserting a new element in $O(m+n)$ time, where the 
+fourth argument $e$ is the new element to insert:
+\begin{codebox}
+\Procname{\proc{Young-Insert}$(Y,m,n,e)$}
+\li $Y[m,n] \gets e$
+\li \For $i \gets 0$ \To $m$
+\li     \Do $Y[i,0] \gets -\infty$
+        \End
+\li \For $j \gets 1$ \To $n$
+\li     \Do $Y[0,j] \gets -\infty$
+        \End
+\li $i \gets m$
+\li $j \gets n$
+\li \While $Y[i-1,j] > Y[i,j]$ or $Y[i,j-1] > Y[i,j]$
+\li     \Do
+            \If $Y[i-1,j] > Y[i, j-1]$
+\li             \Then
+                    exchange $Y[i-1,j] \leftrightarrow Y[i,j]$
+\li                 $i \gets i-1$
+\li             \Else
+                    exchange $Y[i,j-1] \leftrightarrow Y[i,j]$
+\li                 $j \gets j-1$
+                \End
+         \End
+\end{codebox}
+
+
+
+\item  % e
+Use \proc{Young-Insert} $n^2$ times to construct an $n \times n$ Young tableau, 
+then use \proc{Extract-Min} $n^2$ times on this Young tableau to build a sorted 
+list, each time of these $2n^2$ callings takes $O(n)$ time.
+
+
+
+\item  % f
+The following is the searching algorithm, where the fourth argument $x$ is the 
+number to search for. It begins from the lower left corner of a Young tableau, 
+and reduces the searching scope to the upper right corner:
+\begin{codebox}
+\Procname{\proc{Search}$(Y,m,n,x)$}
+\li $i \gets m$
+\li $j \gets 1$
+\li \While $i \geq 1$ and $j \leq n$
+\li     \Do
+            \If $Y[i,j] = x$
+\li             \Then \Return $(i,j)$
+                \End
+\li         \If $Y[i,j] > x$
+\li             \Then
+                    \Comment All $Y[i, j \twodots n]$ are larger than $x$.
+\li                 $i \gets i - 1$
+\li             \Else
+                    \Comment All $Y[1 \twodots i, j]$ are smaller than $x$.
+\li                 $j \gets j + 1$
+                \End
+        \End
+\li \Return \const{nil}
+\end{codebox}
+
+\end{enumerate}
+
+\end{document}

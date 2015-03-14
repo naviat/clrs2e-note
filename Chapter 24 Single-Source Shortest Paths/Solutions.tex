@@ -1,0 +1,31 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{clrscode}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\setlength\mathindent{0em}
+\parskip = 5bp
+
+\title{Solutions for Chapter 24}
+\author{Zhixiang Zhu  \\\href{mailto:zzxiang21cn@hotmail.com}{zzxiang21cn@hotmail.com}}
+
+\begin{document}
+
+\maketitle
+
+\section*{Solution to Exercise 23.1-2}
+
+Suppose there's an {\bf acyclic} path from $s$ to $v$ being $<v_0, v_1, \ldots, v_k>$,
+where $v_0 = s$ and $v_k = v$. Similarly with the proof of lemma 24.2, the path has at
+most $|V| - 1$ edges, and so $k \leq |V| - 1$. Each of the $|V| - 1$ iterations of the
+\For loop of lines 2-4 relaxes all $E$ edges. Among the edges relaxed in the $i$th
+iteration, for $i = 1, 2, \ldots, k$, is $(v_{i - 1}, v_i)$, and $d[v_i]$ becomes finite.
+Therefore, $d[v_k] = d[v]$ will become finite no later than the $k$th iteration.
+
+The opposite direction can be proved by appealing to the no-path property (Corollary
+24.12).
+
+\end{document}

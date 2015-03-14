@@ -1,0 +1,112 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{clrscode}
+\setlength\mathindent{0em}
+\parskip = 7bp
+\begin{document}
+
+\section*{Solution to Exercise 9.2-1}
+
+Suppose that the initial call to \proc{Randomized-Select} is
+``legal'', that is, we have $p \leq r$ and $1 \leq i \leq r-p+1$ at
+the beginning of the initial call. In this case, A recursive call will
+be made to a 0-length array if and only if one of the following two
+cases is met:
+\begin{enumerate}
+\item
+A recursive call is made in line 8 in \proc{Randomized-Select} with
+$q-1 < p$, that is, $q \leq p$.
+\item
+A recursive call is made in line 9 in \proc{Randomized-Select} with
+$q+1 > r$, that is, $q \geq r$.
+\end{enumerate}
+If the first case happens, then we will have $k = q-p+1 \leq 1$
+resulted from line 4 before the recursive call on a 0-length array, so
+that $i < k \leq 1$ due to the \kw{if} condition in line 7, which is
+contradictory to the initial assumption on $i$. Therefore, this case
+won't happen.
+
+If the second case happens, then we will have $k = q-p+1 \geq r-p+1$
+before the recursive call, so that $i > k \geq r-p+1$, which is also
+contradictory to the initial assumption on $i$. Therefore, this case
+won't happen either.
+
+Thus, no recursive call is ever made to a 0-length array.
+
+
+
+
+
+\section*{Solution to Exercise 9.2-2}
+
+$X_k$ is the indicator of whether the subarray $A[p \twodots q]$ has
+exactly $k$ elements after invoking \proc{Randomized-Partition} during
+the current call on \proc{Randomized-Select}, which depends
+\textbf{only on current invoking on \proc{Randomized-Partition}}.
+
+While $T(\max(k-1, n-k))$ is the running time of
+\proc{Randomized-Select} on an array of $\max(k-1, n-k)$ elements,
+which depends on the sequence of invokings on
+\proc{Randomized-Partition} \textbf{after current invoking on it}.
+
+
+
+
+
+
+\section*{Solution to Exercise 9.3-6}
+
+First we will prove that for any $n$-element set, we can divide it
+into $k$ sets, where $2 \leq k \leq n + 1$, with each set having
+either $\lfloor n / k \rfloor$ or $\lceil n / k \rceil$
+elements. Suppose that we have $x$ sets that have $\lceil n / k
+\rceil$ elements, and $k - x$ sets that have $\lfloor n / k \rfloor$
+elements, then we only have to prove that there always exists an
+integer-valued solution with $0 \leq x \leq k$ to the equation of
+\[
+x\lceil n / k \rceil + (k - x) \lfloor n / k \rfloor = n.
+\]
+Simplifying this equation, we have
+\[
+k\lfloor n / k \rfloor + x (\lceil n / k \rceil - \lfloor n / k \rfloor) = n.
+\]
+If $k$ divides $n$ exactly, this equation surely holds. Otherwise, the
+equation becomes $k \lfloor n / k \rfloor + x = n$, so that
+\begin{eqnarray}
+\label{ex-9-3-x-value}
+x & = & n - k\lfloor n / k \rfloor \\
+\nonumber
+  & < & n - k(n / k - 1) \\
+\nonumber
+  & = & k.
+\end{eqnarray}
+and of course, $x \geq 0$ because $k\lfloor n / k \rfloor < n$.
+
+By solving equation \ref{ex-9-3-x-value}, we can know that how many
+sets are of size $\lceil n / k \rceil$, which is the value of $x$,
+and how many sets are of size $\lfloor n / k \rfloor$, which is the
+value of $k - x$.
+
+Therefore, the $k$th quantiles of an $n$-element set are the $\lceil n
+/ k \rceil$th, $2\lceil n / k \rceil$th, $\ldots$, $x\lceil n / k
+\rceil$th, $(x\lceil n / k \rceil + \lfloor n / k \rfloor)$th,
+$(x\lceil n / k \rceil + 2\lfloor n / k \rfloor)$th, $\ldots$, and the
+$(x\lceil n / k \rceil + (k - x - 1)\lfloor n / k \rfloor)$th order
+statistics. Note that these $k - 1$ order statistics do not belong to
+the $k$ sets resulted from the division. Therefore, after division by
+the $k$th quantiles, we will have $k - x - 1$ sets of size $\lfloor n
+/ k \rfloor - 1$, and $x + 1$ sets of size $\lfloor n / k \rfloor$.
+
+The algorithm is implemented by function \texttt{find\_quantile()} in
+\texttt{exercise\_9\_3\_6.c}. The algorithm finds the $\lfloor k / 2
+\rfloor$th smallest one of the $k - 1$ order statistics first and
+partitions the $n$-element set around that element. Then it
+recursively find the $\lfloor k / 2 \rfloor - 1$ smaller order
+statistics in the lower side and the $\lceil k / 2 \rceil - 1$ larger
+order statistics in the higher side. In the worst cases, the
+recursion-tree of the algorithm is of depth $\lg k$, with each
+non-leaf node having two children, and the cost of each node at depth
+$i$ being $cn / 2^i$, where $c$ is some positive constant. Therefore,
+the cost of each level is $cn$, and the running time of the whole
+algorithm is $O(n \lg k)$.
+
+\end{document}

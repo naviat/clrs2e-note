@@ -1,0 +1,900 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{clrscode}
+\setlength\mathindent{0em}
+\parskip = 7bp
+\begin{document}
+
+\section*{Solution to Exercise 15.2-2}
+
+\begin{codebox}
+\Procname{$\proc{Matrix-Chain-Multiply}(A,s,i,j)$}
+\li \If $i = j$
+\li   \Then \Return $A_i$
+\li   \Else $L \gets \proc{Matrix-Chain-Multiply}(A, s, i, s[i,j])$
+\li         $R \gets \proc{Matrix-Chain-Multiply}(A, s, s[i,j]+1, j)$
+\li         \Return $L \cdot R$
+    \End
+\end{codebox}
+
+
+
+
+
+
+\section*{Solution to Exercise 15.2-3}
+
+We will show that $P(n) \geq \frac{1}{4} \cdot 2^n$ for $n \geq 1$.
+Suppose that this bound holds for all $1 \leq k \leq n-1$,
+substituting into recurrence yields
+\begin{eqnarray*}
+P(n) &  =   & \sum_{k=1}^{n-1} P(k) P(n-k) \\
+     & \geq & \sum_{k=1}^{n-1} \left(\frac{1}{4} \cdot 2^k\right)
+              \left(\frac{1}{4} \cdot 2^{n-k}\right) \\
+     &  =   & \frac{1}{16} \cdot (n-1) \cdot 2^n.
+\end{eqnarray*}
+If $n \geq 5$, then we will have $P(n) \geq \frac{1}{16} \cdot 4 \cdot
+2^n = \frac{1}{4} \cdot 2^n$, so that the bound holds for all $n \geq
+1$. As the base cases, we have $P(1) = 1, P(2) = 1, P(3) = 2, P(4) =
+5$. These four cases all support the bound assumed on $P(n)$. Thus,
+$P(n) \geq \frac{1}{4} \cdot 2^n$ for all $n \geq 1$, so that $P(n) =
+\Omega(2^n)$.
+
+
+
+
+
+
+\section*{Solution to Exercise 15.3-4}
+
+The assembly-line scheduling algorithm repeatedly looks up the
+solution to subproblems in stations on the left when solving
+subproblems in stations on the right. In \proc{Fastest-Way}, each
+$f_i[j-1]$ is referenced at least twice--once when computing $f_1[j]$,
+the other when computing $f_2[j]$. If the scheduling algorithm does
+not store the fastest time through $S_{i,j}$ (i.e. the cost of
+subproblems), this value will be computed $\Theta(n-j)$ times when
+finding the fastest way through the stations on the right of
+$S_{i,j}$.
+
+
+
+
+
+
+\section*{Solution to Exercise 15.3-5}
+
+To find such an instance completely by human's brain, the number of
+matrix $n$ must be small. The cases of $n = 1$ and $n = 2$ are
+trivial, so let's set $n$ to 3, and the input sequence of
+\proc{Matrix-Chain-Order} is $<p_0, p_1, p_2, p_3>$.
+
+If the greedy approach mentioned in the exercise yields a suboptimal
+solution, say, it yields $(A_1 (A_2 A_3))$ but the optimal solution is
+$((A_1 A_2) A_3)$, then we must have
+\[
+p_0 p_1 p_3 < p_0 p_2 p_3, \mbox{ or } p_1 < p_2,
+\]
+and
+\[
+p_0 p_1 p_2 + p_0 p_2 p_3 < p_1 p_2 p_3 + p_0 p_1 p_3.
+\]
+We must carefully choose $p_0, p_1, p_2$ and $p_3$ so that both
+inequality hold.
+
+A magic way is that if we set $p_0 < p_1 < p_2 < p_3$, then we will
+have $p_0 p_1 p_2 < p_0 p_1 p_3$ and $p_0 p_2 p_3 < p_1 p_2 p_3$, so
+that both inequality holds. Therefore, a set of qualified instances
+is produced.
+
+We can also set $p_0 > p_1 > p_2 > p_3$ to produce a qualified
+instances. However, in such case, the greedy approach will yield
+$((A_1 A_2) A_3)$, while the optimal solution is $(A_1 (A_2 A_3))$.
+
+
+
+
+
+
+\section*{Solution to Exercise 15.4-4 Part 1}
+
+The procedure below compute the length of an LCS using only $2 \cdot
+n$ entries in the $c$ table plus $O(1)$ additional space without
+copying \textit{current-row} into \textit{previous-row} (while the
+solution in instructor's manual does this copying). Note that this
+procedure assumes that $m \geq 1$.
+
+\begin{codebox}
+\Procname{$\proc{LCS-Length}'(X,Y)$}
+\li $n \gets \id{length}[Y]$
+\li \For $i \gets 1$ \To $n$
+\li   \Do $a[1,i] \gets 0$
+      \End
+\li \For $i \gets 1$ \To $m$
+\li   \Do
+        $\id{cur} \gets (i \mbox{ mod } 2) + 1$
+\li     $\id{prev} \gets (cur \mbox{ mod } 2) + 1$
+\li     \If $x_i = y_1$
+\li       \Then $a[\id{cur}, 1] \gets 1$
+\li       \Else $a[\id{cur}, 1] \gets a[\id{prev}, 1]$
+          \End
+\li     \For $j \gets 2$ \To $n$
+\li       \Do
+            \If $x_i = y_j$
+\li           \Then $a[\id{cur}, j] \gets a[\id{prev}, j-1] + 1$
+\li         \ElseIf $a[\id{prev}, j] \geq a[\id{cur}, j-1]$
+\li           \Then $a[\id{cur}, j] \gets a[\id{prev}, j]$
+\li         \ElseNoIf $a[\id{cur}, j] \gets a[\id{cur}, j-1]$
+              \End
+          \End
+      \End
+\li \Return $a[\id{cur}, n]$
+\end{codebox}
+
+
+
+
+
+
+\section*{Solution to Exercise 15.4-5}
+
+Suppose that the input sequence $X$ is of length $n$. In the
+longest-monotonically-increasing-subsequence (called LMIS) problem, if
+we maintain the longest monotonically increasing subsequence
+\textit{on condition that $X[i]$ is the last element} as the $i$th
+candidate subsequence, then we will have $n$ candidate subsequences
+for the LMIS of $X$.
+
+Let us define three arrays $c$, $d$ and $e$, where $c \lbrack i
+\rbrack$ is the length of LMIS of $X_i$, $d \lbrack i \rbrack$ is the
+length of the $i$th candidate subsequence, $e \lbrack i \rbrack$
+contains the index of the second last element of the $i$th candidate
+subsequence, where a value of 0 indicates that $x_i$ is the first
+element of the $i$th candidate subsequence. Array $e$ can be discarded
+if we need only the length of an LMIS. Procedure \proc{LMIS-Length}
+below returns a number indicating which candidate subsequence is an
+LMIS of $X$, it also returns the $d$ and $e$ arrays.  The running time
+of the procedure is $O(n^2)$.
+
+\begin{codebox}
+\Procname{\proc{LMIS-Length}$(X)$}
+\li $m \gets \id{length}[X]$
+\li $c[0] \gets d[0] \gets 0$
+\li $\id{winner} \gets 0$
+\li \For $i \gets 1$ \To $n$           \label{lmis-len-outer-for-begin}
+\li   \Do                          
+        $d[i] \gets 1$
+\li     $e[i] \gets 0$
+\li     \For $j \gets i-1$ \Downto 1
+\li       \Do
+            \If $x_j \leq x_i$ and $d[i] \leq d[j]$
+\li           \Then
+                $d[i] \gets d[j] + 1$
+\li             $e[i] \gets j$
+              \End
+          \End                     
+\li     \If $d[i] > c[i-1]$
+\li       \Then $c[i] \gets d[i]$
+\li             $\id{winner} \gets i$
+\li       \Else $c[i] \gets c[i-1]$
+          \End
+      \End                             \label{lmis-len-outer-for-end}
+\li \Return \id{winner}, $d$ and $e$
+\end{codebox}
+
+The $e$ array returned by \proc{LMIS-Length} can be used to quickly
+construct an LMIS of $X$. We simply begin at $e[\id{winner}]$ and
+trace back the indices stored in $e$. The following recursive
+procedure prints out an LMIS of $X$ in the proper, forward order. The
+initial invocation is \proc{Print-LMIS}$(e, X, \id{winner})$. The
+procedure takes time $O(n)$.
+
+\begin{codebox}
+\Procname{\proc{Print-LMIS}$(e, X, i)$}
+\li \If $i = 0$
+\li   \Then
+        \Return
+\li   \Else
+        Print-LMIS$(e, X, e[i])$
+\li     print $x_i$
+      \End
+\end{codebox}
+
+Compared with the method described in the unofficial solution to
+homework, the method combining \proc{LMIS-Length} and
+\proc{Print-LMIS} does not require sorting. Therefore, the worst-case
+running time of the method here is a bit more efficient than that of
+the one described in the unofficial-solution pdf file.
+
+
+
+
+
+
+\section*{Solution to Exercise 15.4-6}
+
+In the $i$th iteration of the outer \kw{for} loop in lines
+\ref{lmis-len-outer-for-begin}--\ref{lmis-len-outer-for-end} of
+\proc{LMIS-Length}, we compute the $i$th candidate subsequence with
+the help of an auxiliary array $d$. During the iteration, we compute
+the length of the $i$th candidate subsequence, stored in $d[i]$, by
+scanning through $X_i$ and $d[1..i]$, which takes time $O(n)$. If this
+subprocedure is accelerated to run in $(\lg n)$ time, then the whole
+procedure will take $O(n \lg n)$ time.
+
+We will accomplish this goal through an augmented red-black tree $T$,
+whose keys are the elements of $X$. Each node $t$ is augmented by the
+following fields:
+
+\begin{description}
+\item{$\id{prev}[t]$}
+Pointer to the node containing the second last element (if exists) of
+the candidate subsequence whose last element is $\id{key}[t]$, or
+$\id{nil}[T]$.
+
+\item{$\id{len}[t]$}
+Length of the candidate subsequence ending with $\id{key}[t]$.
+
+\item{$\id{longest}[t]$}
+Pointer to the node whose \id{len} field is the maximum in the subtree
+rooted at $t$.
+\end{description}
+
+We set $\id{prev}[\id{nil}[T]]$ and $\id{longest}[\id{nil}[T]]$ to
+$\id{nil}[T]$, and $\id{len}[\id{nil}[T]]$ to 0.
+
+To maintain these three fields of each node, we need to reimplement
+\proc{RB-Insert}. Lines 3--7 of \proc{RB-Insert} is rewritten as
+below:
+
+\begin{codebox}
+\setlinenumberplus{}{3}
+\li $\id{prev}[z] \gets \id{nil}[T]$
+\li $\id{len}[z] \gets 1$
+\li $\id{longest}[z] \gets z$
+\li \While $x \neq \id{nil}[T]$
+\li   \Do
+        $y \gets x$
+\li     \If $\id{key}[z] < \id{key}[x]$
+\li       \Then
+            $x \gets \id{left}[x]$
+\li       \Else
+            \If $\id{len}[x] \geq \id{len}[z]$
+\li           \Then
+                $\id{prev}[z] \gets x$
+\li             $\id{len}[z] \gets \id{len}[x] + 1$
+              \End
+\li         \If $\id{len}[\id{longest}[\id{left}[x]]] \geq \id{len}[z]$
+\li           \Then
+                $\id{prev}[z] \gets \id{longest}[\id{left}[x]]$
+\li             $\id{len}[z] \gets \id{len}[\id{longest}[\id{left}[x]]]$
+              \End
+\li         $x \gets \id{right}[x]$
+          \End
+      \End
+\end{codebox}
+
+Lines 9--13 of \proc{RB-Insert} is rewritten as:
+
+\begin{codebox}
+\setlinenumberplus{}{18}
+\li \If $y = \id{nil}[T]$
+\li   \Then
+        $\id{root}[T] \gets z$
+\li   \Else
+        \If $\id{key}[z] < \id{key}[y]$
+\li       \Then
+            $\id{left}[y] \gets z$
+\li       \Else
+            $\id{right}[y] \gets z$
+\li         \If $\id{len}[x] \geq \id{len}[z]$
+\li           \Then
+                $\id{prev}[z] \gets x$
+\li             $\id{len}[z] \gets \id{len}[x] + 1$
+              \End
+\li         \If $\id{len}[\id{longest}[\id{left}[y]]] \geq \id{len}[z]$
+\li           \Then
+                $\id{prev}[z] \gets \id{longest}[\id{left}[y]]$
+\li             $\id{len}[z] \gets \id{len}[\id{longest}[\id{left}[y]]]$
+              \End
+          \End
+      \End
+\end{codebox}
+
+Procedure \proc{RB-Insert-Fixup} should be modified to update the
+\id{longest} field of the nodes on the path $z$ has passed through.
+
+The modified insertion operation takes time $O(\lg n)$. Let us name
+this modified insertion operation \proc{RB-Insert-In-LMIS}. The
+following procedure \proc{LMIS} receives an input sequcne $X$ and
+returns its corresponding augmented red-black tree $T$.  This
+procedure takes time $O(n \lg n)$.
+
+\begin{codebox}
+\Procname{$\proc{LMIS}(X)$}
+\li $n \gets \id{length}[X]$
+\li create an empty augmented red-black tree $T$ described above
+\li \For $i \gets 1$ \To $n$
+\li   \Do
+        create a node $t$ with key $x_i$
+\li     $\proc{RB-Insert-In-LMIS}(T,t)$
+      \End
+\li \Return $T$
+\end{codebox}
+
+An LMIS of $X$ can be printed by tracing back through
+$\id{longest}[\id{root}[T]]$ where $T$ is returned by \proc{LMIS}.
+
+
+
+
+
+
+\section*{Solution to Exercise 15.5-4}
+
+There are mainly three modifications. The first is to compute the
+bottom horizontal rows of table $e$, $w$ and $\id{root}$ before we
+enter the three-level nested \kw{for} loops. The second and the third
+are to modify the \kw{for} loop variables $l$ and $r$, so that $l$
+goes from 2 to $n$, and $r$ goes from $\id{root}[i,j-1]$ to
+$\id{root}[i+1,j]$.
+
+We will show that the running time is now shrunk to $\Theta(n^2)$. The
+\proc{Optimal-BST} computes the value of elements in tables $e$, $w$
+and $\id{root}$. There are $\Theta(n^2)$ elements in each table, with
+each element taking $\Omega(1)$ time to compute. Therefore, the
+running time is $\Omega(n^2)$.
+
+As for the upper bound, observe that it takes $\id{root}[i+1,j] -
+\id{root}[i,j-1] + 1$ iterations of the \kw{for} loop of $r$ (the
+inner-most \kw{for} loop) to compute the values at index $[i,j]$ of
+the three tables. Therefore, for the three tables in Figure 15.8, the
+number of iterations of this \kw{for} loop needed to compute the
+horizontal row with $[1,j]$ ($2 \leq j \leq n$) being the left-most
+element is
+\begin{eqnarray*}
+t_j
+& = & \sum_{i=1}^{n-j+1}
+      \left(\id{root}[i+1, j+i-1] - \id{root}[i, j+i-2] + 1\right) \\
+& = & \sum_{i=1}^{n-j+1}
+      \left(\id{root}[i+1, j+i-1] - \id{root}[i, j+i-2]\right)
+      + n - j + 1 \\
+& = & \id{root}[n-j+2, n] - \id{root}[1,j-1] + n - j + 1.
+\end{eqnarray*}
+Note that $\id{root}[n-j+2, n] \leq n$ and $\id{root}[1,j-1] \geq 1$,
+so that $t_j \leq n - 1 + n - j + 1 \leq 2n$. Therefore, the total
+number of iterations needed to compute a whole table (except the
+bottom horizontal row) in Figure 15.8 is $\sum_{j=2}^n t_j \leq
+2n(n-1)$.  Computing the bottom rows needs $n$ iterations, with each
+element taking one, which is performed before we enter the three-level
+nested \kw{for} loops.  Therefore, the total number of iterations
+needed to compute the whole table is no larger than $2n(n-1) + n =
+2n^2 - n$, and the running time of the whole procedure is $O(n^2)$.
+Thus, the modified \proc{Optimal-BST} runs in $\Theta(n^2)$ time.
+
+
+
+
+
+
+\section*{Solution to Problem 15-4}
+
+We will use a dynamic-programming algorithm. Our subproblems will be
+determining the maximal sum of the conviviality ratings of the guests
+in the subtree rooted at node $x$. Let us denote this maximal sum by
+$c[x]$. Suppose that we can add additional informations in the nodes
+of the given tree $T$, then $c[x]$ can be an augmenting attribute of
+node $x$.
+
+Suppose for the moment that $\id{conviviality-ranking}[x] > 0$, and we
+know whether $x$ will attend the party, then
+
+\begin{itemize}
+\item
+If $x$ will not attend the party, then $c[x] = \sum c[y]$ where $y$ is
+$x$'s child, i.e. $x$ is the immediate supervisor of $y$.
+
+\item
+
+If $x$ will attend the party, then $c[x] =
+\id{conviviality-ranking}[x] + \sum c[z]$, where $z$ is $x$'s
+grandchild, i.e., $x$ is the immediate supervisor of $z$'s immediate
+supervisor.  \end{itemize}
+
+The cut-and-paste argument applies. The base case, where $x =
+\const{nil}$, is that $c[\const{nil}] = 0$.
+
+Procedure \proc{Party-Guests} below computes the maximal sums stored
+in the nodes of $T$ in post-traversal order. That is, in order to
+compute $c[x]$, it computes each $c[y]$ in advance where $y$ is $x$'s
+child. To keep track of which person will attend the party, we also
+augment each node $x$ a boolean attribute \id{attend} indicating
+whether $x$ will attend the party if the candidate guests are limited
+to the subtree rooted at $x$.  The initial call is
+\proc{Party-Guest}$(\id{root}[T])$.
+
+\begin{codebox}
+\Procname{$\proc{Party-Guests}(x)$}
+\li \If $x = \const{nil}$
+\li   \Then \Return
+      \End
+\li $c[x] \gets 0$
+\li $s \gets 0$
+\li $y \gets \id{left-child}[x]$
+\li \While $y \neq \const{nil}$
+\li   \Do
+        \proc{Party-Guests}$(y)$
+\li     $c[x] \gets c[x] + c[y]$
+\li     $z \gets \id{left-child}[y]$
+\li     \While $z \neq \const{nil}$
+\li       \Do
+            $s \gets s + c[z]$
+\li         $z \gets \id{right-sibling}[z]$
+          \End  
+\li     $y \gets \id{right-sibling}[y]$
+      \End
+\li \If $\id{conviviality-ranking}[x] > 0$
+\li   \Then
+        $s \gets s + \id{conviviality-ranking}[x]$
+      \End
+\li \If $c[x] < s$
+\li   \Then
+        $c[x] \gets s$
+\li     $\id{attend}[x] \gets \const{true}$
+\li   \Else
+        $\id{attend}[x] \gets \const{false}$
+      \End
+\end{codebox}
+
+The procedure \proc{Print-Guests} prints out the guest list. The
+initial call is \proc{Print-Guests}$(\id{root}[T])$.
+
+\begin{codebox}
+\Procname{$\proc{Print-Guests}(x)$}
+\li \If $x = \const{nil}$
+\li   \Then
+        \Return
+      \End
+\li \If $\id{attend}[x] = \const{true}$
+\li   \Then
+        print $\id{employee-name}[x]$
+\li     $y \gets \id{left-child}[x]$
+\li     \While $y \neq \const{nil}$
+\li       \Do
+            $z \gets \id{left-child}[y]$
+\li         \While $z \neq \const{nil}$
+\li           \Do
+                \proc{Print-Guests}$(z)$
+\li             $z \gets \id{right-sibling}[z]$
+              \End
+\li         $y \gets \id{right-sibling}[y]$
+          \End 
+\li   \Else
+        $y \gets \id{left-child}[x]$
+\li     \While $y \neq \const{nil}$
+\li       \Do
+            \proc{Print-Guests}$(y)$
+\li         $y \gets \id{right-sibling}[y]$
+          \End
+      \End
+\end{codebox}
+
+The running time of \proc{Party-Guests} is $\Theta(n)$ since each node
+is traversed exactly three times, one is when computing its $c$
+attribute, one is as a child, another is as a grandchild. The running
+time of \proc{Print-Guests} is $O(n)$ since each node is printed
+at most once.
+
+If the given tree $T$ is not allowed to be modified, then we can
+create another tree $T'$ which has the same topological structure as
+of $T$, and maintain in each node of $T'$ a pointer to its
+corresponding node in $T$. The modification of the above procedures is
+then straightforward.
+
+
+
+
+
+
+\section*{Solution to Problem 15-5}
+
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+
+\item  % a
+
+We can use traversal approaches similar to breadth-first search or
+depth-first search to find an existing path. However, the running time
+of those approaches are difficult to analyze, because an edge in the
+graph may be traversed more than once. Also, it is difficult to extend
+those approaches to solve the problem of part (b).
+
+A tabular approach is used here in \proc{Find-Path}. We save in
+$d[i,j]$ the second last index of vertex in a path beginning at $v_0$,
+ending at $v_j$ and having $s_i = \langle \sigma_1, \sigma_2, \ldots,
+\sigma_i \rangle$ as its label. If there's no such path, then $d[i,j]
+= -1$.
+
+\begin{codebox}
+\Procname{\proc{Find-Path}$(v_0, G, s)$}
+\li \If $\id{length}[s] \leq 0$
+\li   \Then
+        \Return \const{no-such-path}
+      \End
+\li $n \gets$ number of vertices in $G$
+\li $\id{flag} \gets \const{false}$
+\li \For $j \gets 0$ \To $n-1$
+\li   \Do
+        \If $\sigma(v_0, v_j) = \sigma_1$
+\li       \Then
+            $d[1,j] \gets 0$
+\li         $\id{flag} \gets \const{true}$
+\li       \Else
+            $d[1,j] \gets -1$
+          \End
+      \End
+\li \If $\id{flag} = \const{false}$
+\li   \Then
+        \Return \const{no-such-path} \label{Find-Path-Return-early}
+      \End
+\li $k \gets \id{length}[s]$
+\li \For $i \gets 2$ \To $k$
+\li   \Do
+        $\id{flag} \gets \const{false}$
+\li     \For $j \gets 0$ \To $n-1$
+\li       \Do
+            $d[i,j] \gets -1$
+\li         \For $j' \gets 0$ \To $n-1$
+\li           \Do
+                \If $d[i-1,j'] \neq -1$ and
+                    $\sigma(v_{j'}, v_j) = \sigma_i$
+\li               \Then
+                    $d[i,j] \gets j'$
+\li                 $\id{flag} \gets \const{true}$
+\li                 $j' \gets n$  
+                  \End
+              \End  % for j'
+          \End  % for j
+\li     \If $\id{flag} = \const{false}$
+\li       \Then
+            \Return \const{no-such-path}
+          \End
+      \End  % for i
+\li $j \gets 0$           \label{Find-Path-construct-path-begin}
+\li \While $d[k,j] = -1$
+\li   \Do
+        $j \gets j + 1$
+      \End
+\li $\id{path} \gets \langle v_j \rangle$
+\li $i \gets k$
+\li \For $i \gets k-1$ \Downto $1$
+\li   \Do
+        $j \gets d[i,j]$
+\li     add $v_j$ to the head of \id{path}
+      \End                \label{Find-Path-construct-path-end}
+\li \Return \id{path}
+\end{codebox}
+
+Lines
+\ref{Find-Path-construct-path-begin}--\ref{Find-Path-construct-path-end}
+constructs an existing path.  The worst-case running time of
+\proc{Find-Path} is $O(kn^2)$; while the best-case running time
+(suppose that $k > 0$) is $\Omega(n)$, in which case the procedure
+returns in line \ref{Find-Path-Return-early}.
+
+\item  % b
+
+It is easy to extend the procedure \proc{Find-Path} in part (a) to a
+dynamic programming procedure to find a most probable path.
+
+Suppose that a most probable path starting at $v_0$ and having label
+\\ $\langle \sigma_1, \sigma_2, \ldots, \sigma_k \rangle$ contains the
+edge $(v_{k-1}, v_k)$ as the last edge. Then this path must have gone
+through the most probable path starting at $v_0$, having label
+$s_{k-1} = \langle \sigma_1, \sigma_2, \ldots, \sigma_{k-1} \rangle$
+and ending at $v_{k-1}$. The cut-and-paste argument applies.
+
+We will save in the table entry $c[i,j]$ the probability of the most
+probable path starting at $v_0$, having label $s_i$ and ending at
+$v_j$. If there's no path from $v_0$ to $v_j$ having label $s_i$, then
+$c[i,j] = 0$. The probability of the most probable path starting at
+$v_0$ and having label $s$ will be saved in $c^*$.
+
+We will also use another table $d$ to help us construct a most
+probable path, where $d[i,j]$ is the index of vertex that takes up the
+second last position in the most probable path from $v_0$ to $v_j$
+having label $s_i$. For the most probable path starting at $v_0$ and
+having label $s$, its last vertex will be saved in $d^*$.
+
+\begin{codebox}
+\Procname{\proc{Find-MPP}$(v_0, G, s)$}
+\li \If $\id{length}[s] \leq 0$
+\li   \Then
+        \Return \const{no-such-path}
+      \End
+\li $n \gets$ number of vertices in $G$
+\li $\id{flag} \gets \const{false}$
+\li \For $j \gets 0$ \To $n-1$
+\li   \Do
+        \If $\sigma(v_0, v_j) = \sigma_1$
+\li       \Then
+            $c[1,j] \gets p(v_0, v_j)$
+\li         $d[1,j] \gets 0$
+\li         $\id{flag} \gets \const{true}$
+\li       \Else
+            $c[1,j] \gets 0$
+\li         $d[1,j] \gets -1$
+          \End
+      \End
+\li \If $\id{flag} = \const{false}$
+\li   \Then
+        \Return \const{no-such-path}
+      \End
+\li $k \gets \id{length}[s]$
+\li \For $i \gets 2$ \To $k$
+\li   \Do
+        $\id{flag} \gets \const{false}$
+\li     \For $j \gets 0$ \To $n-1$
+\li       \Do
+            $c[i,j] \gets 0$
+\li         $d[i,j] \gets -1$
+\li         \For $j' \gets 0$ \To $n-1$
+\li           \Do
+                \If $d[i-1,j'] \neq -1$ and
+                    $\sigma(v_{j'}, v_j) = \sigma_i$
+\li               \Then
+                    $q \gets c[i-1,j'] \cdot p(v_{j'}, v_j)$
+\li                 \If $q \geq c[i,j]$
+\li                   \Then
+                        $c[i,j] \gets q$
+\li                     $d[i,j] \gets j'$
+\li                     $\id{flag} \gets \const{true}$
+                      \End
+                  \End
+              \End  % for j'
+          \End  % for j
+\li     \If $\id{flag} = \const{false}$
+\li       \Then
+            \Return \const{no-such-path}
+          \End
+      \End  % for i
+\li $c^* \gets 0$
+\li $d^* \gets 0$
+\li \For $j \gets 0$ \To $n-1$
+\li   \Do
+        \If $c[k,j] > c^*$
+\li       \Then
+            $c^* \gets c[k,j]$
+\li         $d^* \gets j$
+          \End
+      \End
+\li \Return $c$, $d$ and $d^*$
+\end{codebox}
+
+The running time of \proc{Find-MPP} is also $O(kn^2)$.
+
+Procedure \proc{Print-MPP} below can be used to print the most
+probable path which is computed by \proc{Find-MPP}. The initial call
+is \proc{Print-MPP}$(d, G, k, d^*)$.
+
+\begin{codebox}
+\Procname{$\proc{Print-MPP}(d, G, i, j)$}
+\li \If $i > 1$
+\li   \Then
+        \proc{Print-MPP}$(d, g, i-1, d[i,j])$
+      \End
+\li print $v_j$
+\end{codebox}
+
+\end{enumerate}
+
+
+
+
+
+
+\section*{Solution to Problem 15-6}
+
+Suppose that the row index of the checkerboard starts from 1 from the
+top, while the column index starts from 1 from the left. A square in
+the checkerboard is indexed by (row-index, column-index).
+
+\begin{codebox}
+\Procname{$\proc{Pick-Squares}(p, n)$}
+\li \For $i \gets 1$ \To $n$
+\li   \Do
+        $p((n+1,i), (n,i)) \gets -\infty$
+\li     $p((i+1,0), (i,1)) \gets -\infty$
+\li     $p((i+1,n+1), (i,n)) \gets -\infty$
+\li     $c[n+1,i] \gets -\infty$
+      \End
+\li \For $i \gets 2$ \To $n+1$
+\li   \Do
+        $c[i,0] \gets -\infty$
+\li     $c[i,n+1] \gets -\infty$
+      \End
+\li \For $i \gets n$ \Downto 1
+\li   \Do
+        \For $j \gets 1$ \To $n$
+\li       \Do
+            $c[i,j] \gets -\infty$
+\li         $q \gets c[i+1,j-1] + p((i+1,j-1), (i,j))$
+\li         \If $q > c[i,j]$
+\li           \Then
+                $c[i,j] \gets q$
+\li             $d[i,j] \gets j-1$
+              \End
+\li         $q \gets c[i+1,j] + p((i+1,j), (i,j))$
+\li         \If $q > c[i,j]$
+\li           \Then
+                $c[i,j] \gets q$
+\li             $d[i,j] \gets j$
+              \End
+\li         $q \gets c[i+1,j+1] + p((i+1,j+1), (i,j))$
+\li         \If $q > c[i,j]$
+\li           \Then
+                $c[i,j] \gets q$
+\li             $d[i,j] \gets j+1$
+              \End
+          \End
+      \End
+\li \Return $c$ and $d$
+\end{codebox}
+
+
+
+
+
+
+\section*{Solution to Problem 15-7}
+
+Suppose that the maximal possible profit for the $n$ jobs scheduled is
+$P_n$, then we can always find a schedule that obtains profit $P_n$
+such that all the jobs processed in the schedule are completed before
+their deadlines and there's no gap between two consecutive jobs
+processed.  The reason is that if there is a schedule that obtains
+profit $P_n$ and that contains jobs finished after their deadlines,
+then we can remove them from this schedule without affecting the
+profit obtained, since their profits are all 0. If there's a gap, we
+can also remove it without affecting the profit obtained.
+
+Now let's consider finding a schedule of the $n$ jobs that obtains the
+maximal possible profit, on condition that (1) all the jobs processed
+are completed before their deadlines, (2) there's no gap between two
+consecutive jobs processed, and (3) the schedule begins at time 0 and
+ends at \emph{exactly} time $t$. We call such a schedule a
+\emph{Special-Optimal-Schedule} of jobs $a_{1..n}$ in time $t$, or
+SOS$(n,t)$ in short. Based on the fact stated in the paragraph above,
+there must be an SOS$(n,t)$ whose profit is $P_n$. This schedule is
+just the solution to the problem. We know that the processing time of
+each job is an integer between 1 and $n$, therefore $t$ can't exceed
+$n^2$.
+
+Suppose that we have found an SOS$(n,t)$, then we will prove that we
+can reset the jobs processed to be in the incearsing order of their
+deadlines and the new schedule will be still an SOS$(n,t)$:
+
+Suppose that the SOS$(n,t)$ we have found is $a'_{1..i}$, in which
+$a'_{l1}$ has the lastest deadlines of $a'_{1..i}$. Then we can move
+$a'_{l1}$ to the last processing position without changing the profit
+obtained. The reason is as follows. For the jobs processed before
+$a'_{l1}$ in the original schedule, their complete-times are not
+changed. For the jobs processed after $a'_{l1}$ in the original
+schedule, they will just be completed earlier than they were in the
+original schedule. For $a'_{l1}$ itself, first notice that $t$ must be
+no larger than $d'_{l1}$, otherwise the last job in the original
+SOS$(n,t)$ will be completed after its deadline, which is a
+contradiction of the definition of SOS. Since changing the processing
+positions won't cause the total processing time to change, moving
+$a'_{l1}$ to the last position will still let it be completed at time
+$t$, i.e., before $d'_{l1}$. Therefore, the new schedule still runs
+from time 0 to $t$, with each job completed before its deadline, so
+that the total profit of the schedule with positions $1$ to $i$
+doesn't change.  Also, no gap is introduced, the new shcedule $S_1$ is
+still an SOS$(n,t)$.
+
+After setting the job having the lastest deadline in the schedule to
+the last position (position $i$), we consider the job $a'_{l2}$ having
+the second last deadline. Note that currently, all the jobs in
+positions $1$ to $i-1$ must be processed in exactly $t-t'_l$ time with
+each completed before their deadlines, therefore $t-t'_l$ must be no
+larger than $d'_{l2}$.  Thus, if we move $a'_{l2}$ to position $i-1$,
+then the total profit, the start-time and the complete-time of jobs in
+positions $1$ to $i-1$ in the new schedule $S_2$ is the same as those
+of positions $1$ to $i-1$ in $S_1$. The job in position $i$ is the
+same as that in $S_1$, which is $a'_{l1}$. Still, no gap is
+introduced. Thus, $S_2$ is still an SOS$(n,t)$.
+
+Applying this procedure recursively, we will eventually have a
+schedule $S_n$ which is an SOS$(n,t)$ and in which all the jobs
+are processed in the increasing order of their deadilnes. We denote
+this $S_n$ by SOS$'(n,t)$.
+
+The profit of SOS$'(n,t)$ is the same as that of SOS$(n,t)$, which
+indicates that there must also be an SOS$'(n,t)$ whose profit is
+$P_n$.
+
+This helps us find the optimal structure of our problem. Suppose that
+the jobs $a_1, a_2, \ldots, a_n$ are now in the sorted order according
+to the increasing order of their deadlines, and $a'_1, a'_2, \ldots,
+a'_i$ is an SOS$'(n,t)$, then we will have the following
+optimal-substructure: if $a'_i = a_n$, then $a'_1, a'_2, \ldots,
+a'_{i-1}$ is an SOS$'(n - 1, t - t_n)$; if $a'_i \neq a_n$, then
+$a'_1, a'_2, \ldots, a'_{i-1}$ is an SOS$'(n - 1, t)$. The
+cut-and-paste argument applies. This directly implies a dynamic
+programming approach. We will store in $c[i,j]$ the profit obtained by
+SOS$'(i,j)$, and in $l[i,j]$ a boolean value of whether job $a_i$
+appears in the SOS$'(i,j)$ we have found. The entries $c[,0]$ and
+$c[0,]$ are set to be 0.
+
+In order to construct the final schedule we have found, we also need
+to know the exact processing time of the schedule besides table $l$.
+Since each job's processing time is an integer between 1 and $n$, the
+total processing time won't be larger than $\min(n^2, d_n)$.
+Therefore, the second index of the entry which contains the largest
+value in $c[n,1..\min(n^2, d_n)]$ is the exact processing time of the
+schedule we want:
+
+\begin{codebox}
+\Procname{$\proc{Schedule}(a)$}
+\li sort $a$ in place according to the increasing order of deadlines
+\li $n \gets \id{length}[a]$
+\li \For $i \gets 0$ \To $n$
+\li   \Do
+        $c[i,0] \gets 0$
+      \End
+\li $d^* \gets \min(n^2, d_n)$
+\li \For $j \gets 1$ \To $d^*$
+\li   \Do
+        $c[0,j] \gets 0$
+\li     \For $i \gets 1$ \To $n$
+\li       \Do
+            $c[i,j] \gets c[i-1,j]$
+\li         $l[i,j] \gets \const{false}$
+\li         \If $d_i \geq j$ and
+                (($j > t_i$ and $c[i-1,j - t_i] > 0$) or $j = t_i$)
+\li           \Then
+                $q \gets c[i-1, j - t_i] + p_j$
+\li             \If $q > c[i,j]$
+\li               \Then
+                    $c[i,j] \gets q$
+\li                 $l[i,j] \gets \const{true}$
+                  \End  % \If
+              \End  % \If
+          \End  % \For j
+      \End  % \For i
+\li $t \gets 0$
+\li \For $j \gets 1$ \To $d^*$
+\li   \Do
+        \If $c[n,j] > c[n,t]$
+\li       \Then
+            $t \gets j$
+          \End
+      \End
+\li \Return $c$, $l$ and $t$
+\end{codebox}
+
+If we sort the $n$ jobs in $O(n \lg n)$ time, then \proc{Schedule} can
+be run in $O(n \lg n + d^* \cdot n)$ time.
+
+The procedure \proc{Print-Schedule} print the optimal schedule found
+by \proc{Schedule}. The initial call is
+\proc{Print-Schedule}$(a,l,n,t)$.
+
+\begin{codebox}
+\Procname{\proc{Print-Schedule}$(a,l,i,j)$}
+\li \If $i = 0$ or $j = 0$
+\li   \Then
+        \Return
+      \End
+\li \If $l[i,j]$
+\li   \Then
+        \proc{Print-Schedule}$(a, l, i-1, j - t_i)$
+\li     print $a_i$
+\li   \Else
+        \proc{Print-Schedule}$(a, l, i-1, j)$
+      \End
+\end{codebox}
+
+The running time of \proc{Print-Schedule} is $O(n)$.
+
+\end{document}

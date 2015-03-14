@@ -1,0 +1,388 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{clrscode}
+\setlength\mathindent{0em}
+\parskip = 7bp
+\begin{document}
+
+\section*{Solution to Exercise 14.1-8}
+
+For the clearness and convenience of description, the following
+assumptions are given:
+\begin{enumerate}
+\item
+For a given circle, a radius is chosen as the axis.
+
+\item
+A point on the circle is defined by the angle of clockwise rotation
+from the axis to the radius connecting the point and the center. The
+endpoint of the axis on the circle is $0^\circ$. Thus, a point is
+defined as a real number between 0, inclusive, and 360, exclusive.
+
+\item
+A chord $c$ on the circle is defined by two endpoint: $\id{start}[c]$,
+which is the smaller one, and $\id{end}[c]$, which is the larger one.
+\end{enumerate}
+
+The key data structures are two order-statistic trees $S$ and $L$,
+where the key of each node is a real number, which is an endpoint of
+chord. $S$ contains the start endpoint of each chord, while $L$
+contains the end endpoint of each chord. However, each node $x$ in $S$
+contains one more field, \id{other-end}[$x$], which is a pointer to
+the node $y$ in $L$, where \id{key}[$x$] and \id{key}[$y$] is the two
+endpoints of a chord among the $n$ input chords.
+
+Also, a procedure \proc{Get-Smaller-Num}$(T,k)$ is used, which takes a
+binary search tree $T$ and a key $k$ as its input, and returns the
+number of nodes in $T$ whose keys are smaller than $k$. Since this
+procedure can be performed as a slightly modified search operation,
+and takes a red-black tree as its input in the algorithm followed, its
+running time is $O(\lg n)$.
+
+The procedure \proc{Get-Intersect-Num} takes an array of chords as its
+input and returns the number of pairs of chords that intersect inside
+the circle:
+
+\begin{codebox}
+\Procname{\proc{Get-Intersect-Num}$(A)$}
+\li $n \gets \id{length}[A]$
+\li Create two empty order statistic trees $S$ and $L$.
+\li \For $i \gets 1$ \To $n$
+\li   \Do
+        Create a node $x$ for $S$ and another node $y$ for $L$.
+\li     $\id{key}[x] \gets \id{start}[A[i]]$
+\li     $\id{size}[x] \gets 1$
+\li     $\id{other-end}[x] \gets y$
+\li     \proc{RB-Insert}$(S,x)$
+\li     $\id{key}[y] \gets \id{end}[A[i]]$
+\li     $\id{size}[y] \gets 1$
+\li     \proc{RB-Insert}$(L,y)$
+      \End
+\li $\id{count} \gets 0$
+\li \For each node $x$ of $S$ during the in-order walk of $S$
+\li   \Do
+        $y \gets \id{other-end}[x]$
+\li     $\id{count} \gets \id{count} + 
+          \proc{Get-Smaller-Num}(S, \id{key}[y]) - $
+\zi         \proc{OS-Rank}$(L,y)$
+                          \label{li:inter-num-get-count}
+\li     \proc{RB-Delete}$(S,x)$
+\li     \proc{RB-Delete}$(L,y)$
+      \End
+\li \Return \id{count}
+\end{codebox}
+
+Note that the procedures of \proc{RB-Insert} and \proc{RB-Delete} used
+here are the modified versions in Section 14.1 maintaining the size of
+subtree rooted at each node.
+
+Let's argue the correctness of the algorithm first. For any chord $i$,
+We define $a_i$ as its start endpoint, while $b_i$ as its end
+endpoint. Any chords $i$ and $j$ intersect if and only if $a_i < a_j <
+b_i < b_j$ or $a_j < a_i < b_j < b_i$. In the first case, chord $j$
+intersects with $i$ in \emph{forward} direction, since chord $j$ has
+its start endpoint between $a_i$ and $b_i$, but not its end endpoint.
+
+The basic idea of the algorithm is that for each chord $i$, only the
+number of chords which intersect with $i$ in forward direction is
+counted. The first \kw{for} loop sorts the $n$ chords according to
+their start endpoints. Then the second \kw{for} loop traverses the $n$
+chords in this sorted order and count the number of chords that
+intersect with the current chord in forward direction in each
+iteration. After a chord is processed, its endpoints are deleted from
+the two order-statistic red-black trees. This guarantees that the call
+of \proc{Get-Smaller-Num} in line \ref{li:inter-num-get-count} returns
+one plus the number of start endpoints lying between the current
+chord, while the call of \proc{OS-Rank} in the same line returns one
+plus the number of chords whose start endpoints and end endpoints all
+lie between the current chord (so these chords do not intersect with
+the current chord).
+
+The two \kw{for} loops both iterate for $n$ times, with each iteration
+takes $O(\lg n)$-time. Therefore, the whole algorithm takes running
+time of $O(n \lg n)$.
+
+Note: The implementation of algorithm indicated in the file of
+``Problem Set \#4 Solutions.pdf'' may not work correctly. In that
+implementation, all the endpoints are traversed in sorted order
+regardless of being a start endpoint or an end endpoint. A start
+endpoint is deleted only when its corresponding end endpoint is
+met. Consider three chords with the order of endpoints being $a_1 <
+a_2 < a_3 < b_2 < b_3 < b_1$. When $b_2$ is met, $a_2$ is deleted,
+then it is supposed that $a_3$ is the only endpoint in the tree
+indicating that only chord 3 intersect with chord 2 in the forward
+direction. However, by the implementation, $a_1$ is still in the tree
+because $b_1$ has not been met! Therefore, a wrong number of 2 is
+actually counted when $b_2$ is met.
+
+
+
+
+
+
+\section*{Solution to Exercise 14.3-3}
+
+As we travel down the tree, if the current node $x$ does not overlap
+the query interval $i$, then we should go down to either the left or
+right child, which is unambiguous. However, if $x$ overlaps $i$, the
+node $x$ can not be returned immediately because we are not sure
+whether it is the one having the minimum low endpoint. Therefore, we
+still need to check the left subtree of $x$ to see that whether
+there's another node that overlaps $i$. The right subtree doesn't need
+to be check because the low endpoints in it are all smaller than that
+of $x$, which is trivial.
+
+Based on this idea, the iterative version of
+\proc{Min-Interval-Search} is given as below:
+
+\begin{codebox}
+\Procname{\proc{Min-Interval-Search}$(T,i)$}
+\li $x \gets \id{root}[T]$
+\li $\id{min} \gets \id{nil}[T]$
+\li \While $x \neq \id{nil}[T]$
+\li   \Do
+        \If $i$ overlaps \id{int}[$x$]
+\li       \Then
+            $\id{min} \gets x$
+\li         $x \gets \id{left}[x]$
+\li     \ElseIf $\id{left}[x] \neq \id{nil}[T]$
+            and $\id{max}[\id{left}[x]] \geq \id{low}[i]$
+\li       \Then
+            $x \gets \id{left}[x]$
+\li     \ElseNoIf
+            $x \gets \id{right}[x]$
+        \End
+      \End
+\li \Return \id{min}
+\end{codebox}
+The call \proc{Min-Interval-Search}$(T,i)$ takes $O(\lg n)$ time,
+since each iteration of the \kw{while} loop goes one node lower the
+tree, and the height of the tree is $O(\lg n)$.
+
+
+
+
+
+
+\section*{Solution to Exercise 14.3-4}
+
+A simple idea to list all intervals in $T$ that overlap $i$ is calling
+\proc{Interval-Search$(T,i)$} again and again with each time the node
+returned overlapping $i$ deleted from $T$, until \id{nil}[$T$] is
+returned. If there are $k$ qualified intervals in the tree, then this
+method takes $O(k \lg n)$ running time.
+
+If each node is traversed no more than constant times, then the
+running time of the listing procedure will also be $O(n)$, so that all
+intervals in $T$ that overlap $i$ can be listed in $O(\min(n, k \lg
+n))$ time.
+
+The procedure \proc{Interval-Search-All} given below, which takes an
+interval tree $T$ and an interval $i$ as its input and returns a list
+of nodes which overloap $i$, accomplishes this goal.
+
+\begin{codebox}
+\Procname{\proc{Interval-Search-All}$(T,i)$}
+\li create an empty list $L$
+\li create an empty stack $S$
+\li \If $T$ is not empty
+\li   \Then \proc{Push}$(S, \id{root}[T])$ \End
+\li \Repeat                        \label{li:ISA-outer-repeat-begin}
+\li     \While not \proc{Stack-Empty}$(S)$
+           and $\id{max}[S[\id{top}[S]]] < \id{low}[i]$
+                                           \label{li:ISA-while-begin}
+\li       \Do \proc{Pop}$(S)$ \End         \label{li:ISA-while-end}
+\li     \If not \proc{Stack-Empty}$(S)$
+\li       \Then
+            \Repeat                 \label{li:ISA-inner-repeat-begin}
+\li           $x \gets y \gets \proc{Pop}(S)$
+\li           \If $\id{right}[x] \neq \id{nil}[T]$
+\li             \Then \proc{Push}$(S, \id{right}[x])$ \End
+\li           \If $\id{left}[x] \neq \id{nil}[T]$
+                and $\id{max}[\id{left}[x]] \geq \id{low}[i]$
+\li             \Then
+                  \proc{Push}$(S, \id{left}[x])$
+\li               $x \gets \id{left}[x]$
+\li             \Else
+                  $x \gets \id{right}[x]$
+                \End
+\li         \Until $x = \id{nil}[T]$ or $i$ overlaps \id{int}[$y$]
+                                      \label{li:ISA-inner-repeat-end}
+\li         \If $i$ overlaps \id{int}[$y$]
+\li           \Then add $y$ to $L$ \End
+          \End
+\li \Until \proc{Stack-Empty}$(S)$ or $i$ does not overlap \id{int}[$y$]
+                                      \label{li:ISA-outer-repeat-end}
+\li \Return $L$
+\end{codebox}
+
+In the procedure of \proc{Interval-Search-All}, each iteration of the
+outer \kw{repeat} loop of lines
+\ref{li:ISA-outer-repeat-begin}--\ref{li:ISA-outer-repeat-end}
+performs a search in $T$ to find a new (not found in the previous
+iterations) interval that overlaps $i$. If no such interval is found,
+then the outer \kw{repeat} loop ends since all intervals in $T$ that
+overlap $i$ have been found, so that the whole procedure also ends.
+
+The searching procedure in each iteration of the outer \kw{repeat}
+loop is the same as that of \proc{Interval-Search}, except that it
+does not always begin from the root of $T$. This is based on that the
+nodes having been traversed in the previous iterations can be skipped.
+
+The skip is accomplished by an auxiliary stack $S$, which initially
+contains the root of $T$ if $T$ is not empty. As we perform downward
+search in $T$ in each iteration of the inner \kw{repeat} loop of lines
+\ref{li:ISA-inner-repeat-begin}--\ref{li:ISA-inner-repeat-end}, we pop
+the head of the stack, which is also a node of interval tree, to check
+its interval, then push its children to the stack if they
+exist. Therefore, the inner \kw{repeat} loop ends with the roots of
+untraversed subtrees stored in the stack. Notice that these subtrees
+are disjoint. Also, among the roots of these subtrees, those which are
+closer to the head in the stack appear left to other roots in the
+tree, which are further from the head in the stack. Therefore, at the
+start of the next iteration of the outer \kw{repeat} loop of lines
+\ref{li:ISA-outer-repeat-begin}--\ref{li:ISA-outer-repeat-end}, we can
+skip the node traversed previously, and select one of the subtrees not
+traversed to perform our downward search again, in which if there is
+no interval overlapping $i$, then there is no interval overlapping $i$
+in other subtrees. Since each node of $T$ is traversed at most twice,
+of which the first is being pushed into $S$, the second is being pop
+from $S$ to check its interval, the running time of
+\proc{Interval-Search-All}$(T,i)$ is $O(n)$, where $n$ is the number
+of nodes in $T$.
+
+The selection of roots of untraversed subtrees is performed by the
+\kw{while} loop of lines
+\ref{li:ISA-while-begin}--\ref{li:ISA-while-end}, of which the
+priciple is the same as the proof of correctness of line 4 of
+\proc{Interval-Search}$(T,i)$. Because we replace just the head of $S$
+with its children in each iteration of the inner \kw{repeat} loop of
+lines \ref{li:ISA-inner-repeat-begin}--\ref{li:ISA-inner-repeat-end},
+each node in $S$ must be at different depth in $T$, except the head of
+$S$ and its successor. Therefore, the length of $S$ is $O(\lg n)$, so
+that in each iteration of the outer \kw{repeat} loop of lines
+\ref{li:ISA-outer-repeat-begin}--\ref{li:ISA-outer-repeat-end}, the
+running time of the \kw{while} loop of lines
+\ref{li:ISA-while-begin}--\ref{li:ISA-while-end} is also $O(\lg
+n)$. The inner \kw{repeat} loop of lines
+\ref{li:ISA-inner-repeat-begin}--\ref{li:ISA-inner-repeat-end} acts
+exactly the same as \proc{Interval-Search}, except that it doesn't
+always begin from the root of $T$. Therefore, the running time of the
+inner \kw{repeat} loop is $O(\lg n)$. The outer \kw{repeat} loop
+iterate for $k+1$ times where $k$ is the number of intervals that
+overlap $i$ in $T$. Therefore, the running time of the whole procedure
+\proc{Interval-Search-All}$(T,i)$ is also $O(k \lg n)$. Thus, the
+running time of \proc{Interval-Search-All} is $O(\min(n, k \lg
+n))$. What's more, this algorithm also leaves the input tree $T$
+unmodified.
+
+The \proc{Interval-Search-All} procedure can be implemented in a more
+compact version expanding the inner \kw{repeat} loop, which is given
+below:
+
+\begin{codebox}
+\Procname{\proc{Interval-Search-All}$'(T,i)$}
+\li create an empty list $L$
+\li create an empty stack $S$
+\li \If $T$ is not empty
+\li   \Then \proc{Push}$(S, \id{root}[T])$ \End
+\li \Repeat
+\li     \While not \proc{Stack-Empty}$(S)$
+           and $\id{max}[S[\id{top}[S]]] < \id{low}[i]$
+                                         \label{li:ISA'-while-begin}
+\li       \Do \proc{Pop}$(S)$ \End       \label{li:ISA'-while-end}
+\li     \If not \proc{Stack-Empty}$(S)$
+\li       \Then
+            $x \gets y \gets \proc{Pop}(S)$
+\li         \If $\id{int}[y]$ overlaps $i$
+\li           \Then insert $y$ into $L$ \End
+\li         \If $\id{right}[x] \neq \id{nil}[T]$
+\li           \Then \proc{Push}$(S, \id{right}[x])$ \End
+\li         \If     $\id{left}[x] \neq \id{nil}[T]$
+                and $\id{max}[\id{left}[x]] \geq \id{low}[i]$
+\li           \Then
+                \proc{Push}$(S, \id{left}[x])$
+\li             $x \gets \id{left}[x]$
+\li           \Else
+                $x \gets \id{right}[x]$
+              \End
+          \End
+\li \Until \proc{Stack-Empty}$(S)$ or
+           ($x$ = \id{nil}[$T$] and $y$ doesn't overlap $i$)
+\end{codebox}
+
+This version will be more efficient in some situations, since it check
+whether the subtrees rooted at the children of the current node should
+be discarded immediately whenever we replace the head of $S$ with its
+tree children. This check is performed by the \kw{while} loop of lines
+\ref{li:ISA'-while-begin}--\ref{li:ISA'-while-end}. Actually, this
+\kw{while} loop iterates at most twice in each iteration of the
+\kw{repeat} loop, because at the start of the \kw{while} loop, the
+only possible nodes in $S$ whose \id{max} attributes are smaller than
+\id{low}[$i$] are the heading two nodes if the node traversed in the
+previous iteration of the \kw{repeat} loop has two children, or just
+the head of $S$ if it has only one child, or none if it has no
+children.
+
+
+
+
+
+
+\section*{Solution to Exercise 14.3-5}
+
+Only the insert procedure needs to be modified so that when we perform
+an in-order walk on an interval tree, the output intervals is in sorted
+order according to their low endpoints as the first sorting keys and
+their hight endpoints as the second sorting keys.
+
+
+
+
+
+
+\section*{Solution to Exercise 14.3-6}
+
+We can use two augmented red-black tree $T1$ and $T2$ to maintain this
+dynamic set $Q$. The keys in $T1$ are the numbers in $Q$, while the
+keys in $T2$ are the gaps between neighboring numbers in $Q$. As in
+the example given in the exercise, the keys in $T2$ are 4 (= 5 - 1), 4
+(= 9 - 5), 6 (= 15 - 9), 3 (= 18 - 15) and 4 (= 22 - 18). Each node
+$x$ in $T1$ is augmented by an extra attribute:
+\id{successor-gap}$[x]$, which points to a node in $T2$, whose key is
+the gap between \id{key}$[x]$ and the key of the successor of $x$.  In
+the example given in the exercise, if \id{key}$[x]$ is 9, then
+$\id{key}[\id{successor-gap}[x]]$ is 6. The \id{successor-gap} field
+of the maximal node in $T1$ points to \const{nil}. Meanwhile, $T2$ is
+augmented by an extra attribute $\id{min}[T2]$, which is the minimal
+key in $T2$.
+
+Let $n$ be the size of $Q$ at anytime. Then the number of nodes in
+$T1$ is also $n$, while the number of nodes in $T2$ is $n-1$.
+
+The \proc{Insert} operation first inserts a new node into $T1$, which
+runs in $O(\lg n)$ time. After the new node is inserted, the the
+\id{successor-gap} field of its predecessor (if it exists) will have
+to be updated by deleting one relevant node and inserting two new
+nodes in $T2$.  This also runs in $O(\lg n)$ time. If one of the keys
+of the two new node inserted in $T2$ is smaller than $\id{min}[T2]$,
+then $\id{min}[T2]$ should also be updated, which takes $O(1)$ time.
+The whole \proc{Insert} operation runs in $O(\lg n)$ time.
+
+The \proc{Delete} operation first updates the \id{successor-gap} field
+of the predecessor of the node $x$ to be deleted from $T1$. This is
+performed by deleting two relevant nodes (the one pointed to by
+$\id{successor-gap}[x]$ and the one pointed to by the
+\id{successor-gap} field of $x$'s predecessor) and inserting a new node
+in $T2$, which runs in $O(\lg n)$ time. Then, the node in $T1$ is also
+deleted, which again runs in $O(\lg n)$ time. If the minimal node in
+$T2$ is deleted, then $\id{min}[T2]$ will also have to be updated,
+which runs $O(\lg n)$ time. Therefore, the \proc{Delete} operation
+also runs in $O(\lg n)$ time.
+
+The \proc{Search} operation performs ordinary \proc{Tree-Search} on
+$T1$, which takes $O(\lg n)$.
+
+The \proc{Min-Gap} operation simply returns the value of
+$\id{min}[T2]$, which runs in $O(1)$ time.
+
+\end{document}

@@ -1,0 +1,244 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{clrscode}
+\setlength\mathindent{0em}
+\parskip=7bp
+\begin{document}
+
+\section*{Solution to Exercise 8.1-2}
+
+$\lg(n!) = O(n \lg n)$ because $\lg(n!) \leq \lg(n^n) = n \lg n$, while 
+$\lg(n!) = \Theta(n \lg n)$ because
+\begin{eqnarray*}
+\sum_{k=1}^{n} \lg k
+& \geq & \sum_{k=\lceil n / 2 \rceil}^n \lg k \\
+& \geq & \sum_{k=\lceil n / 2 \rceil}^n \lg(n/2) \\
+&  =   & (n - \lceil n / 2 \rceil + 1)\lg(n/2) \\
+& \geq & (n - n / 2)\lg(n/2) \\
+&  =   & (n/2)\lg(n/2) \\
+&  =   & \frac{1}{2} n \lg n - \frac{n}{2}.
+\end{eqnarray*}
+
+
+
+
+
+
+
+\section*{Solution to Exercise 8.2-2}
+
+Suppose that we have $A[s] = A[t]$ and $s < t$ in the input array. Since $j$ 
+goes down from \id{length}$[A]$ to 1 in the \kw{for} loop of lines 9--11, $j$ 
+will meet $t$ first and put $A[t]$ in $C[A[t]]$. After decreasing $C[A[t]]$, 
+$j$ will meet $s$ and put $A[s]$ in $C[A[s]] = C[A[t]]$, so $A[s]$ will be put 
+at a lower index position than that of $A[t]$ in $B$, i.e., $A[s]$ and $A[t]$ 
+still appear in the same order as they do in the input array.
+
+
+
+
+
+
+
+\section*{Solution to Exercise 8.2-4}
+
+\begin{codebox}
+\Procname{\proc{Preprocess}$(A,k)$}
+\li \For $i \gets 0$ \To $k$
+\li     \Do
+            $C[i] \gets 0$
+        \End
+\li \For $j \gets 1$ \To \id{length}$[A]$
+\li     \Do
+            $C[A[j]] \gets C[A[j] + 1$
+        \End
+\li \For $i \gets 1$ \To $k$
+\li     \Do
+            $C[i] \gets C[i] + C[i - 1]$
+        \End
+\li \Return $C$
+\end{codebox}
+
+\begin{codebox}
+\Procname{\proc{Counting-Query}$(C,a,b)$}
+\li \If $a = 0$
+\li     \Then \Return $C[b]$
+\li     \Else \Return $C[b] - C[a - 1]$
+        \End
+\end{codebox}
+
+
+
+
+
+
+
+\section*{Solution to Exercise 8.3-2}
+
+Another scheme that makes any sorting algorithm stable is to make all the 
+elements unique in the input array before sorting them, and change them back to 
+the original values after sorting:
+\begin{codebox}
+\Procname{\proc{Stable-Sort}$(A)$}
+\li $n \gets \id{length}[A]$
+\li $m \gets \lceil \lg(n + 1) \rceil$
+\li \For $i \gets 1$ \To $n$                           \label{li:stable-sort-for-1-begin}
+\li     \Do
+            $A[i] \gets A[i] * 2^m + i$                \label{li:stable-sort-for-1}
+        \End
+\li sort array $A$ by any sorting algorithm
+\li \For $i \gets 1$ \To $n$
+\li     \Do
+            $A[i] \gets \lfloor A[i] / 2^m \rfloor$    \label{li:stable-sort-for-2}
+        \End
+\end{codebox}
+After the \kw{for} loop of lines \ref{li:stable-sort-for-1-begin}--\ref{li:stable-sort-for-1}, 
+each element in array $A$ contains two parts, with the higher order bits storing 
+the original value, and the lower order bits storing the index. Therefore, if 
+two elements in the original array $A$ are different, they are sorted as expected 
+trivially; if they are originally equal, their ties are broken by their indices.
+
+\proc{Stable-Sort} takes $\Theta(n)$ additional time. For $n$ elements, their 
+indices are $1 \ldots n$. Each can be written in $m = \lceil \lg(n + 1) \rceil$ 
+bits, so together they take $\Theta(n \lg n)$ additional space.
+
+Note that the multiplying operation in line \ref{li:stable-sort-for-1} and the 
+dividing operation in line \ref{li:stable-sort-for-2} can be replaced by 
+bit-moving operation in many programming languages.
+
+
+
+
+
+
+
+\section*{Solution to Exercise 8.3-5}
+\begin{enumerate}
+\item
+$d$ passes in the worst case.
+\item
+In the worst case, 9 of 10 piles of cards in the sorting on the $(i + 1)$th 
+digit are needed to keep track of when sorting one piles of cards on the $i$th 
+digit. Therefore, the number of piles of cards needed to keep track of when 
+sorting one piles of cards on the 1st digit is $9(d - 1)$ in the worst case, 
+this is also the maximum number of piles of cards needed to keep track of in the 
+worst case.
+\end{enumerate}
+
+
+
+
+
+
+
+\section*{Solution to Problem 8-5}
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+\stepcounter{enumi}
+\stepcounter{enumi}
+\stepcounter{enumi}
+
+\item  % d
+
+Use heapsort to sort the subarray of $A[i], A[i + k], \ldots, A[n - k + i]$ 
+where $i = 1, 2, \ldots, k-1$ or $k$. This takes $O(n / k \cdot \lg(n / k))$ 
+running time. There are $k$ such subarrays. Thus, the whole sorting algorithm 
+takes $O(n \lg(n / k))$ running time.
+
+
+\stepcounter{enumi}
+
+
+\item  % f
+
+A way to sort an $n$-element array is to $k$-sort the array first, then sort the 
+resulted $k$-sorted array. In this case, let us denote the time to sort an 
+$n$-element array by $T(n)$, the time to $k$-sort an $n$-element array by $T_1(n)$, 
+and the time to sort an $k$-sorted array of length $n$ by $T_2(n)$. Then we have 
+$T(n) = T_1(n) + T_2(n)$ such that the time to $k$-sort an $n$-element array is 
+$T_1(n) = T(n) - T_2(n)$. From the lower bound on comparison sorts, we have $T(n) 
+= \Omega(n \lg n)$ in the worst case. From part \textit{\textbf{e}}, we have 
+$T_2(n) = O(n \lg k) = O(n)$ since $k$ is a constant. Therefore, $T_1(n) = 
+\Omega(n \lg n) - O(n) = \Omega(n \lg n)$ in the worst case.
+
+\end{enumerate}
+
+
+
+
+
+
+
+\section*{Solution to Problem 8-6}
+\begin{enumerate}
+\renewcommand{\labelenumi}{\itshape \bfseries \alph{enumi}.}
+
+\stepcounter{enumi}
+
+\item  % b
+
+According to \textit{\textbf{a}}, there are at least 
+$\left(\!\!\begin{array}{c}2n \\ n\end{array}\!\!\right)$ 
+leaves in the decision tree. Thus, the height of the tree is
+\begin{eqnarray*}
+h 
+& \geq & \lg\left(\!\!\begin{array}{c}2n \\ n\end{array}\!\!\right) \\
+& = & \lg\left(\frac{(2n)!}{(n!)^2}\right) \\
+& = & \lg((2n)!) - 2\lg(n!) \\
+& \geq & \lg\left(\left(\frac{2n}{e}\right)^{2n}\right) - 2\lg(n!) \\
+& = & 2n\lg(2n) - 2n \lg e - 2\lg(n!) \\
+& = & 2n \lg n + 2n - 2n \lg e - 2\lg(n!).
+\end{eqnarray*}
+According to equation (3.19), we have
+\begin{eqnarray*}
+\lg(n!)
+& \leq & \lg\left(\sqrt{2 \pi n} \left(\frac{n}{e}\right)^n e\right) \\
+& = & \frac{1}{2}\lg(2 \pi n) + n \lg\left(\frac{n}{e}\right) + \lg e\\
+& = & \frac{1}{2} \lg n + \frac{1}{2}\lg(2\pi) + n \lg n - n \lg e + \lg e\\
+& = & n \lg n - n \lg e + \frac{1}{2} \lg n + \lg(\sqrt{2\pi}e).
+\end{eqnarray*}
+Now we can continue the bounding on $h$ as
+\begin{eqnarray*}
+h
+& \geq &  2n \lg n + 2n - 2n \lg e - 
+          2\cdot\left(n \lg n - n \lg e + \frac{1}{2} \lg n + \lg(\sqrt{2\pi}e)\right) \\
+& = & 2n - \left(\lg n + \lg(2 \pi e^2)\right) \\
+& = & 2n - o(n).
+\end{eqnarray*}
+Thus, any algorithm merging two sorted lists uses at least $2n - o(n)$ comparisons 
+in the worst case.
+
+
+
+\item  % c
+
+If we view the $n$ input elements as a network with $n$ vertices and each vertex 
+being connected to other $n - 1$ vertices by undirected edges, then a comparison 
+sort can be modeled as checking the edges in the network to select $n - 1$ edges 
+so that the $n$ vertices form a sorted sequence. Therefore, in a comparison sort, 
+each edge that connects two elements consecutive in the sorted order must be 
+checked. That is, if two elements are consecutive in the sorted order, then they 
+must be compared.
+
+The procedure to merge two sorted lists by comparisons can also be viewd as a 
+comparison sort. However, in this case, there are $2(n - 1)$ edges having been 
+checked at the beginning, in which either $n - 1$ edges form a previously sorted 
+list of length $n$. Therefore, if two elements are consecutive in the sorted order 
+and from opposite lists, then the edge connecting them have not been checked at 
+the beginning, and it must be checked in the merging procedure, i.e., the two 
+elements must be compared.
+
+
+
+\item  % d
+
+Let $L[1 \twodots n]$ and $R[1 \twodots n]$ be the two sorted lists to be merged. 
+According to part \textit{\textbf{c}}, in the case that $L[1] < R[1] < L[2] < R[2] 
+< \cdots < L[n - 1] < R[n - 1] < L[n] < R[n]$, $L[1]$ must be compared to $R[1]$, 
+$R[1]$ must be compared to $L[2]$, \ldots, and so on. Therefore, there are 
+$2n - 1$ comparisons. Thus, the lower bound on the worst-case number of comparisons 
+is $2n - 1$.
+
+\end{enumerate}
+
+\end{document}
+
