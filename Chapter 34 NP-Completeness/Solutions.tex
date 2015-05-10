@@ -1,0 +1,39 @@
+\documentclass[a4paper, fleqn]{article}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{clrscode}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\setlength\mathindent{0em}
+\parskip = 5bp
+
+\title{Solutions for Chapter 34}
+\author{Zhixiang Zhu  \\\href{mailto:zzxiang21cn@hotmail.com}{zzxiang21cn@hotmail.com}}
+
+\begin{document}
+
+\maketitle
+
+\section*{Solution to Exercise 34.1-1}
+
+The `if' part: If \proc{longest-path} $\in$ P, we can call \proc{longest-path} with $k =
+|E|, |E| - 1, \ldots, 0$ until \proc{longest-path} returns 1 or $k = 0$ to get the length
+of a longest simple path between $u, v$. There're at most $|E|$ such calls, so
+\proc{longest-path-length} $\in$ P.
+
+The `only if' part: If \proc{longest-path-length} $\in$ P, we can call
+\proc{longest-path-length} in \proc{longest-path} to compare the length of a longest
+simple path with $k$ to decide wether to return 0 or 1. So \proc{longest-path} $\in$ P.
+
+
+\section*{Solution to Exercise 34.1-2}
+
+The optimization problem is defined as the relation that associates each instance of an
+undirected graph with a longest simple cycle in the graph. A related decision problem is
+defined as \proc{longest-simple-cycle-length} = $\{ \langle G, k \rangle : G = (V, E)$ is
+an undirected graph, $k \geq 0$ is an integer, and there exists a simple cycle in $G$
+consisting of at least $k$ edges $\}$.
+
+\end{document}
